@@ -1,0 +1,52 @@
+import sys
+import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore, QtGui
+
+def create_plot():
+    # Create a PlotWidget
+    plot_widget = pg.PlotWidget()
+
+    # Create some plot items
+    plot_item1 = pg.PlotCurveItem([1, 2, 3, 4, 5], [1, 3, 2, 4, 3], pen='r')
+    plot_item2 = pg.PlotCurveItem([1, 2, 3, 4, 5], [2, 4, 3, 1, 2], pen='b')
+
+    # Enable mouse interaction on each plot item
+    plot_item1.setMovable(True)
+    plot_item1.setSelectable(True)
+    plot_item2.setMovable(True)
+    plot_item2.setSelectable(True)
+
+    # Add the plot items to the plot widget
+    plot_widget.addItem(plot_item1)
+    plot_widget.addItem(plot_item2)
+
+    return plot_widget
+
+def main():
+    # Create the QApplication
+    app = QtGui.QApplication(sys.argv)
+
+    # Create the main window
+    main_window = QtGui.QMainWindow()
+    main_window.setWindowTitle('Multiple Graphics Items Example')
+
+    # Create the central widget and layout
+    central_widget = QtGui.QWidget()
+    layout = QtGui.QVBoxLayout()
+    central_widget.setLayout(layout)
+
+    # Create the plot and add it to the layout
+    plot = create_plot()
+    layout.addWidget(plot)
+
+    # Set the central widget of the main window
+    main_window.setCentralWidget(central_widget)
+
+    # Show the main window
+    main_window.show()
+
+    # Start the event loop
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
