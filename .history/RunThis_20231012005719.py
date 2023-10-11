@@ -75,7 +75,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v2_btn_move_right.clicked.connect(self.v2_move_right)
 
 # PLAY_PAUSE_KEY
-        self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
+        self.v1_btn_start_pause.toggled.connect(self.toggle_animation)
         # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
     
 ################################################      COMMON FUNCTIONS      ################################################
@@ -129,7 +129,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(True)
             senderBtn.setText('Play Animation')
-
 # Toggle signal live plotting
     def toggle_animation(self):
         if self.animation_running:

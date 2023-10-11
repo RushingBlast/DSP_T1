@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>827</width>
+    <width>833</width>
     <height>535</height>
    </rect>
   </property>
@@ -73,6 +73,9 @@
           </property>
           <property name="shortcut">
            <string>Space</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -217,6 +220,9 @@
           <property name="shortcut">
            <string>Shift+Space</string>
           </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="0" column="2">
@@ -329,8 +335,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>827</width>
-     <height>22</height>
+     <width>833</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -36,9 +36,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.counter = count(0,1)
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update)
-        self.animation_running = False
-        # self.animation_running_v1 = False # Flag to track animation state
-        # self.animation_running_v2 = False # Flag to track animation state
+        self.animation_running = True # Flag to track animation state
         
 
         # Connect to buttons
@@ -74,9 +72,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v1_btn_move_right.clicked.connect(self.v1_move_right)
         self.v2_btn_move_right.clicked.connect(self.v2_move_right)
 
-# PLAY_PAUSE_KEY
-        self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
-        # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
     
 ################################################      COMMON FUNCTIONS      ################################################
 
@@ -96,48 +91,41 @@ class myWindow(QMainWindow, Ui_MainWindow):
 # """    
 
 #TODO - Still WIP
-    def update(self):
-        self.update_v1()
-        # self.update_v2()
-        # if self.animation_running_v1:
-        #     self.update_v1()
-        # if self.animation_running_v2:
-        #     self.update_v2()
-            
+    def update(self, plot_widget = pg.PlotWidget):
+        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
+            for i in range(len(self.loaded_signals)):
+                self.y[i].append(self.loaded_signals[i][self.current_index]) # type: ignore
+                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
 
+                # Adjust x-axis limits to create a scrolling effect
+                if self.current_index >= self.x_max:
+                    self.x_min += 1
+                    self.x_max += 1
 
-    
+            plot_widget.clear()
+            for i in range(len(self.loaded_signals)):
+                plot_widget.plot(self.x[i], self.y[i]) # type: ignore
+
+            plot_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
+            self.current_index += 1
+        else:
+            self.stop_animation()
 
 #TODO - Still WIP
 # Start signal playback
-    def start_animation(self):
+    def start_animation(self, viewButton = QtWidgets.QPushButton):
         self.timer.start(1)
         self.animation_running = True
-        senderBtn = self.sender() # Returns object that sent the signal
-        # if senderBtn is self.v1_btn_start_pause:
-        #     senderBtn.
-        if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
-            senderBtn.setChecked(False)
-            senderBtn.setText('Stop Animation')
+        viewButton.setChecked(viewButton, False)
+        viewButton.setText(viewButton, 'Stop Animation')
 
 #TODO - Still WIP
 # Stop Signal Playback
-    def stop_animation(self):
+    def stop_animation(self, viewButton = QtWidgets.QPushButton):
         self.timer.stop()
         self.animation_running = False
-        senderBtn = self.sender()
-        if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
-            senderBtn.setChecked(True)
-            senderBtn.setText('Play Animation')
-
-# Toggle signal live plotting
-    def toggle_animation(self):
-        if self.animation_running:
-            self.stop_animation()
-        else:
-            self.start_animation()
-
-
+        viewButton.setChecked(viewButton,True)
+        viewButton.setText(viewButton,'Play Animation')
 
 
 # Load Data from file and append them to signal list
@@ -243,33 +231,8 @@ class myWindow(QMainWindow, Ui_MainWindow):
         if self.v1_widget is not None:
             self.v1_widget.clear()
         self.v1_widget.plot(self.read_signal_file())
-        self.show()
         self.start_animation()
-        self.v1_btn_start_pause.setText('Stop Animation')
-        self.v1_btn_start_pause.setChecked(True)
-        
-        
-        
-# Update View 1
-    def update_v1(self):
-        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
-            for i in range(len(self.loaded_signals)):
-                self.y[i].append(self.loaded_signals[i][self.current_index]) # type: ignore
-                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
-
-                # Adjust x-axis limits to create a scrolling effect
-                if self.current_index >= self.x_max:
-                    self.x_min += 1
-                    self.x_max += 1
-
-            self.v1_widget.clear()
-            for i in range(len(self.loaded_signals)):
-                self.v1_widget.plot(self.x[i], self.y[i]) # type: ignore
-
-            self.v1_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
-            self.current_index += 1
-        else:
-            self.stop_animation()
+        self.show()
 
 
 #x Zoom in view 1
@@ -320,30 +283,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
             self.v2_widget.clear()
         self.v2_widget.plot(self.read_signal_file())
         self.show()
-        self.start_animation()
-        self.v2_btn_start_pause.setText('Stop Animation')
-        self.v2_btn_start_pause.setChecked(True)
-        
-# Update View 2
-    def update_v2(self):
-        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
-            for i in range(len(self.loaded_signals)):
-                self.y[i].append(self.loaded_signals[i][self.current_index]) # type: ignore
-                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
-
-                # Adjust x-axis limits to create a scrolling effect
-                if self.current_index >= self.x_max:
-                    self.x_min += 1
-                    self.x_max += 1
-
-            self.v2_widget.clear()
-            for i in range(len(self.loaded_signals)):
-                self.v2_widget.plot(self.x[i], self.y[i]) # type: ignore
-
-            self.v2_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
-            self.current_index += 1
-        else:
-            self.stop_animation()
 
 # Zoom in view 2        
     def v2_zoom_in(self):

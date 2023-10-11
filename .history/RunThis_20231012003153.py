@@ -36,9 +36,8 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.counter = count(0,1)
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update)
-        self.animation_running = False
-        # self.animation_running_v1 = False # Flag to track animation state
-        # self.animation_running_v2 = False # Flag to track animation state
+        self.animation_running_v1 = False # Flag to track animation state
+        self.animation_running_v2 = False # Flag to track animation state
         
 
         # Connect to buttons
@@ -75,8 +74,8 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v2_btn_move_right.clicked.connect(self.v2_move_right)
 
 # PLAY_PAUSE_KEY
-        self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
-        # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
+        self.v1_btn_start_pause.toggled.connect(self.toggle_animation)
+        self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
     
 ################################################      COMMON FUNCTIONS      ################################################
 
@@ -97,12 +96,10 @@ class myWindow(QMainWindow, Ui_MainWindow):
 
 #TODO - Still WIP
     def update(self):
-        self.update_v1()
-        # self.update_v2()
-        # if self.animation_running_v1:
-        #     self.update_v1()
-        # if self.animation_running_v2:
-        #     self.update_v2()
+        if self.animation_running_v1:
+            self.update_v1()
+        if self.animation_running_v2:
+            self.update_v2()
             
 
 
@@ -111,11 +108,10 @@ class myWindow(QMainWindow, Ui_MainWindow):
 #TODO - Still WIP
 # Start signal playback
     def start_animation(self):
-        self.timer.start(1)
+        # self.timer.start(1)
         self.animation_running = True
         senderBtn = self.sender() # Returns object that sent the signal
-        # if senderBtn is self.v1_btn_start_pause:
-        #     senderBtn.
+        if senderBtn is self.v1_btn_start_pause
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(False)
             senderBtn.setText('Stop Animation')
@@ -129,7 +125,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(True)
             senderBtn.setText('Play Animation')
-
 # Toggle signal live plotting
     def toggle_animation(self):
         if self.animation_running:

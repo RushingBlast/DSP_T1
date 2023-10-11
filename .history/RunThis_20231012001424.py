@@ -35,10 +35,8 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.x_max = fixed_window_size
         self.counter = count(0,1)
         self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.update)
-        self.animation_running = False
-        # self.animation_running_v1 = False # Flag to track animation state
-        # self.animation_running_v2 = False # Flag to track animation state
+        self.timer.timeout.connect(self.update_v1)
+        self.animation_running = False # Flag to track animation state
         
 
         # Connect to buttons
@@ -76,7 +74,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
 
 # PLAY_PAUSE_KEY
         self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
-        # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
     
 ################################################      COMMON FUNCTIONS      ################################################
 
@@ -97,13 +94,26 @@ class myWindow(QMainWindow, Ui_MainWindow):
 
 #TODO - Still WIP
     def update(self):
-        self.update_v1()
-        # self.update_v2()
-        # if self.animation_running_v1:
-        #     self.update_v1()
-        # if self.animation_running_v2:
-        #     self.update_v2()
-            
+        plot_widget = self.v2_widget
+        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
+            for i in range(len(self.loaded_signals)):
+                self.y[i].append(self.loaded_signals[i][self.current_index]) # type: ignore
+                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
+
+                # Adjust x-axis limits to create a scrolling effect
+                if self.current_index >= self.x_max:
+                    self.x_min += 1
+                    self.x_max += 1
+
+            plot_widget.clear()
+            for i in range(len(self.loaded_signals)):
+                plot_widget.plot(self.x[i], self.y[i]) # type: ignore
+                
+
+            plot_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
+            self.current_index += 1
+        else:
+            self.stop_animation()
 
 
     
@@ -114,8 +124,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.timer.start(1)
         self.animation_running = True
         senderBtn = self.sender() # Returns object that sent the signal
-        # if senderBtn is self.v1_btn_start_pause:
-        #     senderBtn.
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(False)
             senderBtn.setText('Stop Animation')
@@ -129,7 +137,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(True)
             senderBtn.setText('Play Animation')
-
 # Toggle signal live plotting
     def toggle_animation(self):
         if self.animation_running:

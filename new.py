@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(827, 535)
+        MainWindow.resize(833, 535)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.centralwidget)
@@ -45,6 +45,7 @@ class Ui_MainWindow(object):
         self.v1_btn_clone_signal2.setObjectName("v1_btn_clone_signal2")
         self.gridLayout.addWidget(self.v1_btn_clone_signal2, 2, 1, 1, 1)
         self.v1_btn_start_pause = QtWidgets.QPushButton(self.centralwidget)
+        self.v1_btn_start_pause.setCheckable(True)
         self.v1_btn_start_pause.setObjectName("v1_btn_start_pause")
         self.gridLayout.addWidget(self.v1_btn_start_pause, 0, 1, 1, 1)
         self.v1_btn_signal_start_point = QtWidgets.QPushButton(self.centralwidget)
@@ -104,6 +105,7 @@ class Ui_MainWindow(object):
         self.v2_btn_add_signal.setObjectName("v2_btn_add_signal")
         self.gridLayout_2.addWidget(self.v2_btn_add_signal, 0, 0, 1, 1)
         self.v2_btn_start_pause = QtWidgets.QPushButton(self.centralwidget)
+        self.v2_btn_start_pause.setCheckable(True)
         self.v2_btn_start_pause.setObjectName("v2_btn_start_pause")
         self.gridLayout_2.addWidget(self.v2_btn_start_pause, 0, 1, 1, 1)
         self.v2_btn_signal_start_point = QtWidgets.QPushButton(self.centralwidget)
@@ -148,7 +150,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addLayout(self.verticalLayout_4, 0, 2, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 827, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 833, 26))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
