@@ -78,6 +78,10 @@ class myWindow(QMainWindow, Ui_MainWindow):
 # PLAY_PAUSE_KEY
         self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
         # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
+
+# Capture_Screenshots
+        self.v1_btn_save.clicked.connect(lambda: self.capture_screenshot_1(self.v1_widget))
+        self.v2_btn_save.clicked.connect(lambda: self.capture_screenshot_2(self.v2_widget))
     
 ################################################      COMMON FUNCTIONS      ################################################
 
@@ -119,7 +123,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         #     senderBtn.
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(False)
-            senderBtn.setIcon(QIcon('pause.png'))
+            senderBtn.setIcon(QIcon('Assets\pause.png'))
 
 #TODO - Still WIP
 # Stop Signal Playback
@@ -129,7 +133,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         senderBtn = self.sender()
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(True)
-            senderBtn.setIcon(QIcon('play.png'))
+            senderBtn.setIcon(QIcon('Assets\play.png'))
 
 # Toggle signal live plotting
     def toggle_animation(self):
@@ -308,9 +312,13 @@ class myWindow(QMainWindow, Ui_MainWindow):
             x_max += 50
             self.v1_widget.setXRange(x_min, x_max, padding=0)
 
-
-    
-
+# Capture screenshot in view 1
+#    def capture_screenshot_1(self, widget):
+ #       screenshot = widget.grab()
+  #      screenshot.save("screenshot.png", "PNG")
+    def capture_screenshot_1(self, widget):
+        screenshot = QtGui.QPixmap(widget.grab())
+        screenshot.save("screenshot.png", "PNG")
 
 ################################################      VIEW_2 FUNCTIONS      ################################################
 
@@ -381,6 +389,11 @@ class myWindow(QMainWindow, Ui_MainWindow):
             x_min += 50
             x_max += 50
             self.v2_widget.setXRange(x_min, x_max, padding=0)
+
+# Capture screenshot in view 2
+    def capture_screenshot_2(self, widget):
+        screenshot = QtGui.QPixmap(widget.grab())
+        screenshot.save("screenshot.png", "PNG")
     
 ##############################################################################################################################
 app = QApplication(sys.argv)

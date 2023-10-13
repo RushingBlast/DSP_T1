@@ -73,7 +73,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>play.png</normaloff>play.png</iconset>
+            <normaloff>Assets/play.png</normaloff>Assets/play.png</iconset>
           </property>
           <property name="shortcut">
            <string>Space</string>
@@ -107,7 +107,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (3).png</normaloff>pngwing.com (3).png</iconset>
+            <normaloff>Assets/save.png</normaloff>Assets/save.png</iconset>
           </property>
          </widget>
         </item>
@@ -125,7 +125,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (6).png</normaloff>pngwing.com (6).png</iconset>
+            <normaloff>Assets/restart.png</normaloff>Assets/restart.png</iconset>
           </property>
          </widget>
         </item>
@@ -136,7 +136,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>zoom_in.png</normaloff>zoom_in.png</iconset>
+            <normaloff>Assets/zoom_in.png</normaloff>Assets/zoom_in.png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Up</string>
@@ -150,7 +150,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (5).png</normaloff>pngwing.com (5).png</iconset>
+            <normaloff>Assets/left_arrow.png</normaloff>Assets/left_arrow.png</iconset>
           </property>
           <property name="shortcut">
            <string>Left</string>
@@ -164,7 +164,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (1).png</normaloff>pngwing.com (1).png</iconset>
+            <normaloff>Assets/zoom_out.png</normaloff>Assets/zoom_out.png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Down</string>
@@ -185,7 +185,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (4).png</normaloff>pngwing.com (4).png</iconset>
+            <normaloff>Assets/right_arrow.png</normaloff>Assets/right_arrow.png</iconset>
           </property>
           <property name="shortcut">
            <string>Right</string>
@@ -247,7 +247,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>play.png</normaloff>play.png</iconset>
+            <normaloff>Assets/play.png</normaloff>Assets/play.png</iconset>
           </property>
           <property name="shortcut">
            <string>Shift+Space</string>
@@ -278,7 +278,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (6).png</normaloff>pngwing.com (6).png</iconset>
+            <normaloff>Assets/restart.png</normaloff>Assets/restart.png</iconset>
           </property>
          </widget>
         </item>
@@ -296,7 +296,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (5).png</normaloff>pngwing.com (5).png</iconset>
+            <normaloff>Assets/left_arrow.png</normaloff>Assets/left_arrow.png</iconset>
           </property>
           <property name="shortcut">
            <string>Shift+Left</string>
@@ -310,7 +310,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (4).png</normaloff>pngwing.com (4).png</iconset>
+            <normaloff>Assets/right_arrow.png</normaloff>Assets/right_arrow.png</iconset>
           </property>
           <property name="shortcut">
            <string>Shift+Right</string>
@@ -324,7 +324,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (3).png</normaloff>pngwing.com (3).png</iconset>
+            <normaloff>Assets/save.png</normaloff>Assets/save.png</iconset>
           </property>
          </widget>
         </item>
@@ -342,7 +342,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>zoom_in.png</normaloff>zoom_in.png</iconset>
+            <normaloff>Assets/zoom_in.png</normaloff>Assets/zoom_in.png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Shift+Up</string>
@@ -356,7 +356,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>pngwing.com (1).png</normaloff>pngwing.com (1).png</iconset>
+            <normaloff>Assets/zoom_out.png</normaloff>Assets/zoom_out.png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Shift+Down</string>
