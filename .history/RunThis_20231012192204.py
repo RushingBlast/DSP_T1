@@ -228,7 +228,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
             
 # Start signal playback for View 1
     def start_animation_v1(self):
-        self.timer_v1.start(1)
+        self.timer_v1.start(50)
         self.animation_running_v1 = True
         senderBtn = self.sender() # Returns object that sent the signal
         # if senderBtn is self.v1_btn_start_pause:
@@ -331,7 +331,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
             
 # Start signal playback for View 2
     def start_animation_v2(self):
-        self.timer_v2.start(1)
+        self.timer_v2.start(50)
         self.animation_running_v2 = True
         senderBtn = self.sender() # Returns object that sent the signal
         if senderBtn is self.v2_btn_start_pause:

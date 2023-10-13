@@ -25,28 +25,20 @@ class myWindow(QMainWindow, Ui_MainWindow):
         super(myWindow, self).__init__()
         self.setupUi(self)
         
-        self.v1_x_values = self.v2_x_values = [[]] #type:ignore
-        self.v1_y_values = self.v2_y_values = [[]] #type:ignore
-        
-    # CLASS  VARIABLES
-        
-        self.loaded_signals_v1 = self.loaded_signals_v2 = [] # List that holds currently loaded signals
-        self.current_index_v1 = self.current_index_v2 = 0 # TODO Make a comment for this variable
-        
-        
-        # X Min and Max for setting Xaxis range
-        self.x_min_v1 = self.x_min_v2 = 0
-        self.x_max_v1 = self.x_max_v2  = fixed_window_size
+        # uic.loadUi('p1.ui', self)
+        self.x = [[]]
+        self.y = [[]]
+        self.loaded_signals = []
+        # class variables
+        self.current_index = 0
+        self.x_min = 0
+        self.x_max = fixed_window_size
         self.counter = count(0,1)
-        
-        # Timers to drive animated playback for each view
-        self.timer_v1 = QtCore.QTimer(self)
-        self.timer_v2 = QtCore.QTimer(self)
-        self.timer_v1.timeout.connect(self.update_v1)
-        self.timer_v2.timeout.connect(self.update_v2)
-        # self.animation_running = False
-        self.animation_running_v1 = False # Flag to track animation state
-        self.animation_running_v2 = False # Flag to track animation state
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update_v1_opt)
+        self.animation_running = False
+        # self.animation_running_v1 = False # Flag to track animation state
+        # self.animation_running_v2 = False # Flag to track animation state
         
 
         # Connect to buttons
@@ -83,14 +75,73 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v2_btn_move_right.clicked.connect(self.v2_move_right)
 
 # PLAY_PAUSE_KEY
-        self.v1_btn_start_pause.clicked.connect(self.toggle_animation_v1)
-        self.v2_btn_start_pause.clicked.connect(self.toggle_animation_v2)
+        self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
+        # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
     
 ################################################      COMMON FUNCTIONS      ################################################
 
+# TODO Remove this early file opening function if new one works
+# """
+# Read csv files and save them in a list
+#     def read_signal_file(self):
+#         file_dialog = QFileDialog()
+#         file_dialog.exec()
+#         filename = file_dialog.selectedFiles().pop()
+#         path = str(Path(filename))
+#         data = pd.read_csv(path).iloc[:, 0]
+#         # save signals
+#         # self.loaded_signals.append(data.iloc[:, 0].tolist())
+#         # print(len(self.loaded_signals))
+#         return data
+# """    
+
+#TODO - Still WIP
+    def update(self):
+        self.update_v1()
+        # self.update_v2()
+        # if self.animation_running_v1:
+        #     self.update_v1()
+        # if self.animation_running_v2:
+        #     self.update_v2()
+            
+
+
+    
+
+#TODO - Still WIP
+# Start signal playback
+    def start_animation(self):
+        self.timer.start(1)
+        self.animation_running = True
+        senderBtn = self.sender() # Returns object that sent the signal
+        # if senderBtn is self.v1_btn_start_pause:
+        #     senderBtn.
+        if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
+            senderBtn.setChecked(False)
+            senderBtn.setText('Stop Animation')
+
+#TODO - Still WIP
+# Stop Signal Playback
+    def stop_animation(self):
+        self.timer.stop()
+        self.animation_running = False
+        senderBtn = self.sender()
+        if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
+            senderBtn.setChecked(True)
+            senderBtn.setText('Play Animation')
+
+# Toggle signal live plotting
+    def toggle_animation(self):
+        if self.animation_running:
+            self.stop_animation()
+        else:
+            self.start_animation()
+
+
+
 
 # Load Data from file and append them to signal list
-    def read_signal_file(self, viewport):
+    def read_signal_file(self):
 
         # Open a file dialog to select a file with supported extensions
         open_file_dialog = QFileDialog.Options()
@@ -157,15 +208,9 @@ class myWindow(QMainWindow, Ui_MainWindow):
             
             # Extract the signal data and create a new PlotItem for it
             loaded_signal = dataFrame.iloc[:NUMBER_OF_DATAPOINTS, 0].tolist()
-            
-            if viewport is self.v2_widget:
-                self.loaded_signals_v2.append(loaded_signal)
-                self.v2_x_values.append([])
-                self.v2_y_values.append([])
-            else:
-                self.loaded_signals_v1.append(loaded_signal)
-                self.v1_x_values.append([])
-                self.v1_y_values.append([])    
+            self.loaded_signals.append(loaded_signal)
+            self.x.append([])
+            self.y.append([])
             
             return loaded_signal
 
@@ -174,7 +219,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
             # plot_item.setLabel('left', 'Amplitude')
             # plot_item.plot(pen='g')  # Create a new plot in the PlotItem
 
-        # self.start_animation()
+        self.start_animation()
         
         
                     
@@ -197,65 +242,77 @@ class myWindow(QMainWindow, Ui_MainWindow):
     def v1_add_signal(self):
         if self.v1_widget is not None:
             self.v1_widget.clear()
-        self.v1_widget.plot(self.read_signal_file(self.v1_widget))
+        self.v1_widget.plot(self.read_signal_file())
         self.show()
-        self.start_animation_v1()
-        self.v1_btn_start_pause.setText('Stop Animation')
-        self.v1_btn_start_pause.setChecked(True)
+        # self.start_animation()
+        # self.v1_btn_start_pause.setText('Stop Animation')
+        # self.v1_btn_start_pause.setChecked(True)
         
-
-    
-# Optimized version of Update_v1 
+        
+        
+# Update View 1
     def update_v1(self):
-        loaded_signals_length = len(self.loaded_signals_v1[0])
-        if self.loaded_signals_v1 and self.current_index_v1 < loaded_signals_length:
-            for loaded_signal, y_values, x_values in zip(self.loaded_signals_v1, self.v1_y_values, self.v1_x_values): #type: ignore
-                y_values.append(loaded_signal[self.current_index_v1])
-                x_values.append(self.current_index_v1)
+        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
+            for i in range(len(self.loaded_signals)):
+                self.y[i].append(self.loaded_signals[i][self.current_index]) # type: ignore
+                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
+
+                # Adjust x-axis limits to create a scrolling effect
+                if self.current_index >= self.x_max:
+                    self.x_min += 1
+                    self.x_max += 1
 
             self.v1_widget.clear()
-            for x_values, y_values in zip(self.v1_x_values, self.v1_y_values): #type: ignore
+            for i in range(len(self.loaded_signals)):
+                self.v1_widget.plot(self.x[i], self.y[i]) # type: ignore
+
+            self.v1_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
+            self.current_index += 1
+        else:
+            self.stop_animation()
+    
+    
+# Optimized version of Update_v1
+    # def update_v1_opt(self):
+    #     loaded_signals_length = len(self.loaded_signals[0])
+    #     if self.loaded_signals and self.current_index < loaded_signals_length:            
+    #         self.v1_widget.clear()
+    #         for i, (x_values, y_values) in enumerate(zip(self.x, self.y)):
+    #             y_values.append(self.loaded_signals[i][self.current_index])
+    #             x_values.append(self.current_index)
+    #             self.v1_widget.plot(x_values,y_values)
+               
+               
+                # if self.current_index >= self.x_max:
+                #     self.x_min += 1
+                #     self.x_max += 1
+                    
+    #         self.v1_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
+    #         self.current_index += 1
+    #     else:
+    #         self.stop_animation()
+    
+    def update_v1_opt(self):
+        loaded_signals_length = len(self.loaded_signals[0])
+        if self.loaded_signals and self.current_index < loaded_signals_length:
+            for loaded_signal, y_values, x_values in zip(self.loaded_signals, self.y, self.x):
+                y_values.append(loaded_signal[self.current_index])
+                x_values.append(self.current_index)
+
+            self.v1_widget.clear()
+            for x_values, y_values in zip(self.x, self.y):
                 self.v1_widget.plot(x_values, y_values)
-                if self.current_index_v1 >= self.x_max_v1:
-                    self.x_min_v1 += 1
-                    self.x_max_v1 += 1
-
-            self.v1_widget.setXRange(self.x_min_v1, self.x_max_v1, padding=0)
-            self.current_index_v1 += 1
+                if self.current_index >= self.x_max:
+                    self.x_min += 1
+                    self.x_max += 1
+    
+            self.v1_widget.setXRange(self.x_min, self.x_max, padding=0)
+            self.current_index += 1
         else:
-            self.stop_animation_v1()
-            
-            
-# Start signal playback for View 1
-    def start_animation_v1(self):
-        self.timer_v1.start(1)
-        self.animation_running_v1 = True
-        senderBtn = self.sender() # Returns object that sent the signal
-        # if senderBtn is self.v1_btn_start_pause:
-        #     senderBtn.
-        if senderBtn is self.v1_btn_start_pause:
-            senderBtn.setChecked(False) #type: ignore
-            senderBtn.setText('Stop Animation') #type: ignore
+            self.stop_animation()
 
 
-# Stop Signal Playback for View 1
-    def stop_animation_v1(self):
-        self.timer_v1.stop()
-        self.animation_running_v1 = False
-        senderBtn = self.sender()
-        if senderBtn is self.v1_btn_start_pause:
-            senderBtn.setChecked(True) #type: ignore
-            senderBtn.setText('Play Animation') #type: ignore
-
-# Toggle signal playback for View 1
-    def toggle_animation_v1(self):
-        if self.animation_running_v1:
-            self.stop_animation_v1()
-        else:
-            self.start_animation_v1()
-
-
-# Zoom in view 1
+#x Zoom in view 1
     def v1_zoom_in(self):
         # Zoom in by adjusting x-axis limits (decrease window size)
         x_min, x_max = self.v1_widget.viewRange()[0]
@@ -301,63 +358,33 @@ class myWindow(QMainWindow, Ui_MainWindow):
     def v2_add_signal(self):
         if self.v2_widget is not None:
             self.v2_widget.clear()
-        self.v2_widget.plot(self.read_signal_file(self.v2_widget))
+        self.v2_widget.plot(self.read_signal_file())
         self.show()
-        self.start_animation_v2()
+        self.start_animation()
         self.v2_btn_start_pause.setText('Stop Animation')
         self.v2_btn_start_pause.setChecked(True)
         
 # Update View 2
     def update_v2(self):
-        loaded_signals_length = len(self.loaded_signals_v2[0])
-        if self.loaded_signals_v2 and self.current_index_v2 < loaded_signals_length:
-            for loaded_signal, y_values, x_values in zip(self.loaded_signals_v2, self.v2_y_values, self.v2_x_values): #type: ignore
-                y_values.append(loaded_signal[self.current_index_v2])
-                x_values.append(self.current_index_v2)
+        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
+            for i in range(len(self.loaded_signals)):
+                self.y[i].append(self.loaded_signals[i][self.current_index]) # type: ignore
+                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
+
+                # Adjust x-axis limits to create a scrolling effect
+                if self.current_index >= self.x_max:
+                    self.x_min += 1
+                    self.x_max += 1
 
             self.v2_widget.clear()
-            for x_values, y_values in zip(self.v2_x_values, self.v2_y_values): #type: ignore
-                self.v2_widget.plot(x_values, y_values)
-                if self.current_index_v2 >= self.x_max_v2:
-                    self.x_min_v2 += 1
-                    self.x_max_v2 += 1
+            for i in range(len(self.loaded_signals)):
+                self.v2_widget.plot(self.x[i], self.y[i]) # type: ignore
 
-            self.v2_widget.setXRange(self.x_min_v2, self.x_max_v2, padding=0)
-            self.current_index_v2 += 1
+            self.v2_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
+            self.current_index += 1
         else:
             self.stop_animation()
-            
-            
-            
-# Start signal playback for View 2
-    def start_animation_v2(self):
-        self.timer_v2.start(1)
-        self.animation_running_v2 = True
-        senderBtn = self.sender() # Returns object that sent the signal
-        if senderBtn is self.v2_btn_start_pause:
-            senderBtn.setChecked(False) #type: ignore
-            senderBtn.setText('Stop Animation') #type: ignore
 
-
-
-# Stop Signal Playback for View 2
-    def stop_animation_v2(self):
-        self.timer_v2.stop()
-        self.animation_running_v2 = False
-        senderBtn = self.sender()
-        if senderBtn is self.v2_btn_start_pause:
-            senderBtn.setChecked(True) #type: ignore
-            senderBtn.setText('Play Animation') #type: ignore
-
-# Toggle signal playback for View 2
-    def toggle_animation_v2(self):
-        if self.animation_running_v2:
-            self.stop_animation_v2()
-        else:
-            self.start_animation_v2()
-            
-            
-            
 # Zoom in view 2        
     def v2_zoom_in(self):
         # Zoom in by adjusting x-axis limits (decrease window size)
