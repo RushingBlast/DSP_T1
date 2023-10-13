@@ -69,7 +69,11 @@
         <item row="0" column="1">
          <widget class="QPushButton" name="v1_btn_start_pause">
           <property name="text">
-           <string>start/pause</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>play.png</normaloff>play.png</iconset>
           </property>
           <property name="shortcut">
            <string>Space</string>
@@ -99,7 +103,11 @@
         <item row="2" column="0">
          <widget class="QPushButton" name="v1_btn_save">
           <property name="text">
-           <string>save</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (3).png</normaloff>pngwing.com (3).png</iconset>
           </property>
          </widget>
         </item>
@@ -113,14 +121,22 @@
         <item row="1" column="0">
          <widget class="QPushButton" name="v1_btn_restart">
           <property name="text">
-           <string>restart</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (6).png</normaloff>pngwing.com (6).png</iconset>
           </property>
          </widget>
         </item>
         <item row="2" column="2">
          <widget class="QPushButton" name="v1_btn_zoom_in">
           <property name="text">
-           <string>zoom_in</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>zoom_in.png</normaloff>zoom_in.png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Up</string>
@@ -130,7 +146,11 @@
         <item row="1" column="2">
          <widget class="QPushButton" name="v1_btn_move_left">
           <property name="text">
-           <string>move_left</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (5).png</normaloff>pngwing.com (5).png</iconset>
           </property>
           <property name="shortcut">
            <string>Left</string>
@@ -140,7 +160,11 @@
         <item row="2" column="3">
          <widget class="QPushButton" name="v1_btn_zoom_out">
           <property name="text">
-           <string>zoom_out</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (1).png</normaloff>pngwing.com (1).png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Down</string>
@@ -157,7 +181,11 @@
         <item row="1" column="3">
          <widget class="QPushButton" name="v1_btn_move_right">
           <property name="text">
-           <string>move_right</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (4).png</normaloff>pngwing.com (4).png</iconset>
           </property>
           <property name="shortcut">
            <string>Right</string>
@@ -215,7 +243,11 @@
         <item row="0" column="1">
          <widget class="QPushButton" name="v2_btn_start_pause">
           <property name="text">
-           <string>start/pause</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>play.png</normaloff>play.png</iconset>
           </property>
           <property name="shortcut">
            <string>Shift+Space</string>
@@ -242,7 +274,11 @@
         <item row="1" column="0">
          <widget class="QPushButton" name="v2_btn_restart">
           <property name="text">
-           <string>restart</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (6).png</normaloff>pngwing.com (6).png</iconset>
           </property>
          </widget>
         </item>
@@ -256,7 +292,11 @@
         <item row="1" column="2">
          <widget class="QPushButton" name="v2_btn_move_left">
           <property name="text">
-           <string>move_left</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (5).png</normaloff>pngwing.com (5).png</iconset>
           </property>
           <property name="shortcut">
            <string>Shift+Left</string>
@@ -266,7 +306,11 @@
         <item row="1" column="3">
          <widget class="QPushButton" name="v2_btn_move_right">
           <property name="text">
-           <string>move_right</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (4).png</normaloff>pngwing.com (4).png</iconset>
           </property>
           <property name="shortcut">
            <string>Shift+Right</string>
@@ -276,7 +320,11 @@
         <item row="2" column="0">
          <widget class="QPushButton" name="v2_btn_save">
           <property name="text">
-           <string>save</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (3).png</normaloff>pngwing.com (3).png</iconset>
           </property>
          </widget>
         </item>
@@ -290,7 +338,11 @@
         <item row="2" column="2">
          <widget class="QPushButton" name="v2_btn_zoom_in">
           <property name="text">
-           <string>zoom_in</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>zoom_in.png</normaloff>zoom_in.png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Shift+Up</string>
@@ -300,7 +352,11 @@
         <item row="2" column="3">
          <widget class="QPushButton" name="v2_btn_zoom_out">
           <property name="text">
-           <string>zoom_out</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>pngwing.com (1).png</normaloff>pngwing.com (1).png</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+Shift+Down</string>
@@ -336,7 +392,7 @@
      <x>0</x>
      <y>0</y>
      <width>833</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

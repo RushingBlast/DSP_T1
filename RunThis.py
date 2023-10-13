@@ -10,6 +10,7 @@ from PyQt5 import uic
 import pyedflib
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout
 import numpy as np
+from PyQt5.QtGui import QIcon
 
 ################################################      GLOBAL CONSTANTS      ################################################
 
@@ -118,7 +119,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         #     senderBtn.
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(False)
-            senderBtn.setText('Stop Animation')
+            senderBtn.setIcon(QIcon('pause.png'))
 
 #TODO - Still WIP
 # Stop Signal Playback
@@ -128,7 +129,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         senderBtn = self.sender()
         if senderBtn in (self.v1_btn_start_pause, self.v2_btn_start_pause):
             senderBtn.setChecked(True)
-            senderBtn.setText('Play Animation')
+            senderBtn.setIcon(QIcon('play.png'))
 
 # Toggle signal live plotting
     def toggle_animation(self):
@@ -245,7 +246,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v1_widget.plot(self.read_signal_file())
         self.show()
         self.start_animation()
-        self.v1_btn_start_pause.setText('Stop Animation')
         self.v1_btn_start_pause.setChecked(True)
         
         
@@ -281,6 +281,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         new_window_size = max(10, window_size * 0.88)  # Limit minimum window size
         center = (x_min + x_max) / 2
         self.v1_widget.setXRange(center - new_window_size / 2, center + new_window_size / 2, padding=0)
+        
         
 # Zoom out view 1
     def v1_zoom_out(self):
@@ -321,7 +322,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v2_widget.plot(self.read_signal_file())
         self.show()
         self.start_animation()
-        self.v2_btn_start_pause.setText('Stop Animation')
         self.v2_btn_start_pause.setChecked(True)
         
 # Update View 2
@@ -354,6 +354,7 @@ class myWindow(QMainWindow, Ui_MainWindow):
         new_window_size = max(10, window_size * 0.88)  # Limit minimum window size
         center = (x_min + x_max) / 2
         self.v2_widget.setXRange(center - new_window_size / 2, center + new_window_size / 2, padding=0)
+
 
 # Zoom out view 2
     def v2_zoom_out(self):
