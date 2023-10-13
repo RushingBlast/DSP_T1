@@ -202,7 +202,10 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionOpen_File = QtWidgets.QAction(MainWindow)
         self.actionOpen_File.setObjectName("actionOpen_File")
+        self.actionExport_PDF = QtWidgets.QAction(MainWindow)
+        self.actionExport_PDF.setObjectName("actionExport_PDF")
         self.menuFile.addAction(self.actionOpen_File)
+        self.menuFile.addAction(self.actionExport_PDF)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -239,6 +242,7 @@ class Ui_MainWindow(object):
         self.v2_speed_label.setText(_translate("MainWindow", "Speed"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.actionOpen_File.setText(_translate("MainWindow", "Open File"))
+        self.actionExport_PDF.setText(_translate("MainWindow", "Export PDF"))
 from pyqtgraph import PlotWidget
 
 

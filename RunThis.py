@@ -11,6 +11,9 @@ import pyedflib
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout
 import numpy as np
 from PyQt5.QtGui import QIcon
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import tempfile
 
 ################################################      GLOBAL CONSTANTS      ################################################
 
@@ -79,9 +82,17 @@ class myWindow(QMainWindow, Ui_MainWindow):
         self.v1_btn_start_pause.clicked.connect(self.toggle_animation)
         # self.v2_btn_start_pause.clicked.connect(self.toggle_animation)
 
+
+
+# List to store the screenshots
+        self.screenshots = []  
+
 # Capture_Screenshots
-        self.v1_btn_save.clicked.connect(lambda: self.capture_screenshot_1(self.v1_widget))
-        self.v2_btn_save.clicked.connect(lambda: self.capture_screenshot_2(self.v2_widget))
+        self.v1_btn_save.clicked.connect(lambda: self.capture_screenshot(self.v1_widget))
+        self.v2_btn_save.clicked.connect(lambda: self.capture_screenshot(self.v2_widget))
+
+# Save Screenshots as PDF
+        self.actionExport_PDF.triggered.connect(self.save_screenshots_as_pdf)
     
 ################################################      COMMON FUNCTIONS      ################################################
 
@@ -313,12 +324,32 @@ class myWindow(QMainWindow, Ui_MainWindow):
             self.v1_widget.setXRange(x_min, x_max, padding=0)
 
 # Capture screenshot in view 1
-#    def capture_screenshot_1(self, widget):
- #       screenshot = widget.grab()
-  #      screenshot.save("screenshot.png", "PNG")
-    def capture_screenshot_1(self, widget):
+    def capture_screenshot(self, widget):
         screenshot = QtGui.QPixmap(widget.grab())
-        screenshot.save("screenshot.png", "PNG")
+        self.screenshots.append(screenshot)
+
+# Saving screenshot as pdf
+    def save_screenshots_as_pdf(self):
+        if not self.screenshots:
+            return  # No screenshots to save
+
+        pdf_filename = "screenshots.pdf"
+
+        pdf_canvas = canvas.Canvas(pdf_filename, pagesize=letter)
+
+        for screenshot in self.screenshots:
+            image_path = self.save_pixmap_as_image(screenshot)
+            pdf_canvas.drawImage(image_path, x=0, y=0, width=letter[0], height=letter[1])
+            pdf_canvas.showPage()
+
+        pdf_canvas.save()
+        
+# Saving the QPixmap object as a temporary PNG image file
+    def save_pixmap_as_image(self, pixmap):
+        temp_file = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+        pixmap.save(temp_file.name, 'PNG')
+        temp_file.close()
+        return temp_file.name
 
 ################################################      VIEW_2 FUNCTIONS      ################################################
 
@@ -391,9 +422,9 @@ class myWindow(QMainWindow, Ui_MainWindow):
             self.v2_widget.setXRange(x_min, x_max, padding=0)
 
 # Capture screenshot in view 2
-    def capture_screenshot_2(self, widget):
-        screenshot = QtGui.QPixmap(widget.grab())
-        screenshot.save("screenshot.png", "PNG")
+#    def capture_screenshot_2(self, widget):
+#        screenshot = QtGui.QPixmap(widget.grab())
+#        screenshot.save("screenshot.png", "PNG")
     
 ##############################################################################################################################
 app = QApplication(sys.argv)
