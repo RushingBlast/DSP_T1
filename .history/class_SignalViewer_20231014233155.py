@@ -211,8 +211,8 @@ class SignalView(QWidget):
             plotted_signal.sigClicked.connect(self.return_selected_signal)
         self.plot_widget.setXRange(self.x_min, self.x_max, padding=0)
         QApplication.processEvents()
-        # if not self.animation_running:
-        #     self.start_animation()
+        if not self.animation_running:
+            self.start_animation()
 
 
     
@@ -331,9 +331,6 @@ class SignalView(QWidget):
             plot_item = self.plot_widget.getPlotItem()
             plot_item.setLabel('bottom', 'Time')
             plot_item.setLabel('left', 'Amplitude')
-            
-            # Enable mouse controls
-            self.plot_widget.setMouseEnabled(x=True, y=True)
 
         self.start_animation()
 

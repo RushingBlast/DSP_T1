@@ -333,7 +333,7 @@ class SignalView(QWidget):
             plot_item.setLabel('left', 'Amplitude')
             
             # Enable mouse controls
-            self.plot_widget.setMouseEnabled(x=True, y=True)
+            self.plot_widget.setMouseEnabled(x=False, y=False)
 
         self.start_animation()
 

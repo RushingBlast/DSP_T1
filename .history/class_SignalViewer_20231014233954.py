@@ -331,9 +331,6 @@ class SignalView(QWidget):
             plot_item = self.plot_widget.getPlotItem()
             plot_item.setLabel('bottom', 'Time')
             plot_item.setLabel('left', 'Amplitude')
-            
-            # Enable mouse controls
-            self.plot_widget.setMouseEnabled(x=True, y=True)
 
         self.start_animation()
 
