@@ -14,7 +14,13 @@ from PyQt5.QtGui import QIcon
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import tempfile
-
+import datetime
+import uuid
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Image, Spacer, PageBreak, PageTemplate, Frame, Paragraph
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 ################################################      GLOBAL CONSTANTS      ################################################
 
 NUMBER_OF_DATAPOINTS = 10000 # Can be adjusted as needed
@@ -328,22 +334,51 @@ class myWindow(QMainWindow, Ui_MainWindow):
         screenshot = QtGui.QPixmap(widget.grab())
         self.screenshots.append(screenshot)
 
+
+
 # Saving screenshot as pdf
     def save_screenshots_as_pdf(self):
         if not self.screenshots:
             return  # No screenshots to save
 
-        pdf_filename = "screenshots.pdf"
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        unique_id = str(uuid.uuid4().hex[:8])  # Generate a unique identifier
+        pdf_filename = f"report_{timestamp}_{unique_id}.pdf"
 
-        pdf_canvas = canvas.Canvas(pdf_filename, pagesize=letter)
+        # Create a SimpleDocTemplate with A4 size and specified margins
+        doc = SimpleDocTemplate(pdf_filename, pagesize=A4,
+                                leftMargin=0.5 * inch, rightMargin=0.5 * inch,
+                                topMargin= 0.9 * inch, bottomMargin=0.5 * inch)
 
-        for screenshot in self.screenshots:
-            image_path = self.save_pixmap_as_image(screenshot)
-            pdf_canvas.drawImage(image_path, x=0, y=0, width=letter[0], height=letter[1])
-            pdf_canvas.showPage()
+        # Create a list to hold the elements (screenshots) for the PDF
+        elements = []
 
-        pdf_canvas.save()
-        
+        screenshot_width = 5 * inch  # Adjust the width as desired
+        screenshot_height = 2 * inch  # Adjust the height as desired
+
+        # Split the screenshots into groups of four
+        grouped_screenshots = [self.screenshots[i:i+4] for i in range(0, len(self.screenshots), 4)]
+
+        for group in grouped_screenshots:
+            # Create a list to hold the elements for each group of four screenshots
+            group_elements = []
+
+            for screenshot in group:
+                # Add the image to the group elements list
+                image_path = self.save_pixmap_as_image(screenshot)
+                image = Image(image_path, width=screenshot_width, height=screenshot_height)
+                group_elements.append(image)
+                group_elements.append(Spacer(0, 20))  # Add spacing under each image
+
+            # Add the group elements to the main elements list
+            elements.extend(group_elements)
+
+            # Add a page break after each group of four screenshots
+            elements.append(PageBreak())
+
+        # Build the PDF document with the elements list
+        doc.build(elements)
+
 # Saving the QPixmap object as a temporary PNG image file
     def save_pixmap_as_image(self, pixmap):
         temp_file = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
@@ -421,11 +456,6 @@ class myWindow(QMainWindow, Ui_MainWindow):
             x_max += 50
             self.v2_widget.setXRange(x_min, x_max, padding=0)
 
-# Capture screenshot in view 2
-#    def capture_screenshot_2(self, widget):
-#        screenshot = QtGui.QPixmap(widget.grab())
-#        screenshot.save("screenshot.png", "PNG")
-    
 ##############################################################################################################################
 app = QApplication(sys.argv)
 
