@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 import pandas as pd
 import numpy as np
 import pyqtgraph as pg
+from itertools import count
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
     QApplication,
@@ -17,7 +18,6 @@ from PyQt5.QtWidgets import (
     QShortcut,
     QSlider  # Import QSlider for speed control
 )
-
 import pyedflib
 
 # Just a Placeholder key for shortcuts
@@ -66,7 +66,6 @@ class SignalView(QWidget):
         self.initUI()
 
     def initUI(self):
-        # self.plot_widget = pg.PlotWidget()
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setLabel('bottom', 'Time')
         self.plot_widget.setLabel('left', 'Amplitude')
@@ -129,9 +128,10 @@ class SignalView(QWidget):
 
 
         self.setLayout(layout)
-        
+
+        self.counter = count(0, 1)
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update)
+        self.timer.timeout.connect(self.update_new)
         self.animation_speed = 100  # Default speed
         self.start_animation()
         
@@ -143,9 +143,9 @@ class SignalView(QWidget):
 
     
     def update(self):
-        if self.loaded_signals and self.current_index < len(self.loaded_signals[0].getData()[0]):
+        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
             for i in range(len(self.loaded_signals)):
-                self.y[i].append(self.loaded_signals[i].getData()[1][self.current_index])
+                self.y[i].append(self.loaded_signals[i][self.current_index])
                 self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
 
                 # Adjust x-axis limits to create a scrolling effect
@@ -204,7 +204,8 @@ class SignalView(QWidget):
     def start_animation(self):
         # Calculate the animation interval based on the speed
         interval = int(1000 / self.animation_speed)  # Convert the interval to an integer
-        self.timer.start(interval)
+        # self.timer.start(interval)
+        self.timer.start(100)
         self.animation_running = True
         self.start_button.setChecked(False)
         self.start_button.setText('Stop Animation')
@@ -310,12 +311,10 @@ class SignalView(QWidget):
         curve_color = random.choice(self.colors_list)
         
         # Create the signal object and add it to PlotWidget
-        # signal = pg.PlotDataItem(signal_data, pen = curve_color, name = curve_color + "_Signal", clickable = True )
         signal = pg.PlotDataItem(signal_data, pen = curve_color, name = curve_color + "_Signal", clickable = True )
         
         # Return the signal that was clicked to be used by other methods
-        signal.sigClicked.connect(self.return_selected_signal)        
-        
+        signal.sigClicked.connect(self.return_selected_signal)
         
         self.loaded_signals.append(signal)
         self.plot_widget.addItem(signal)
@@ -329,9 +328,9 @@ class SignalView(QWidget):
         # self.loaded_signals.append(loaded_signal)
         # self.x.append([])
         # self.y.append([])
-        # self.start_animation()
+        self.start_animation()
 
-    
+        
 
 def main():
     app = QApplication(sys.argv)

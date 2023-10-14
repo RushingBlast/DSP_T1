@@ -1,9 +1,11 @@
 import sys
-import random
+import typing
+import threading
 from PyQt5 import QtCore
 import pandas as pd
 import numpy as np
 import pyqtgraph as pg
+from itertools import count
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
     QApplication,
@@ -17,7 +19,6 @@ from PyQt5.QtWidgets import (
     QShortcut,
     QSlider  # Import QSlider for speed control
 )
-
 import pyedflib
 
 # Just a Placeholder key for shortcuts
@@ -42,7 +43,6 @@ class SignalView(QWidget):
         self.x_min = 0
         self.x_max = fixed_window_size  # Initially set x_max to fixed_window_size
         self.loaded_signals = []  # List to store loaded signal data
-        self.colors_list = ["Red", "Green", "Blue", "Yellow"]
 
         # Create shortcuts        
         self.play_pause_shortcut = QShortcut(play_pause_key, self)
@@ -55,7 +55,7 @@ class SignalView(QWidget):
         self.move_right_shortcut.activated.connect(self.move_right)
 
         self.open_file_shortcut = QShortcut(load_csv_key, self)
-        self.open_file_shortcut.activated.connect(self.add_new_signal)
+        self.open_file_shortcut.activated.connect(self.load_new_csv)
 
         self.zoom_in_shortcut = QShortcut(zoom_in_key, self)
         self.zoom_in_shortcut.activated.connect(self.zoom_in)
@@ -66,7 +66,6 @@ class SignalView(QWidget):
         self.initUI()
 
     def initUI(self):
-        # self.plot_widget = pg.PlotWidget()
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setLabel('bottom', 'Time')
         self.plot_widget.setLabel('left', 'Amplitude')
@@ -77,10 +76,8 @@ class SignalView(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.plot_widget)
         
-        # Horizontal layout to carry the control buttons
-        button_layout = QHBoxLayout()
-        # Vertical layout to carry the slider and button layout
-        button_slider_layout = QVBoxLayout()
+        # Horizontal layout to carry the controls
+        button_layout = QGridLayout()
         
         # Add Start Animation button
         self.start_button = QPushButton('Stop Animation')
@@ -98,7 +95,7 @@ class SignalView(QWidget):
 
         # Add a button to load a new CSV file
         self.load_button = QPushButton('Load CSV')
-        self.load_button.clicked.connect(self.add_new_signal)
+        self.load_button.clicked.connect(self.load_new_csv)
         button_layout.addWidget(self.load_button)
         # Add Zoom in button
         self.zoom_in_button = QPushButton('Zoom In')
@@ -117,11 +114,9 @@ class SignalView(QWidget):
         self.speed_slider.setTickPosition(QSlider.TicksBelow)
         self.speed_slider.setTickInterval(10)
         self.speed_slider.valueChanged.connect(self.update_speed)
-        
-        
-        button_slider_layout.addLayout(button_layout)
-        button_slider_layout.addWidget(self.speed_slider)
-        self.button_container.setLayout(button_slider_layout)
+
+        button_layout.addWidget(self.speed_slider, 1, 0, Qt.)
+        self.button_container.setLayout(button_layout)
 
 
 
@@ -129,7 +124,8 @@ class SignalView(QWidget):
 
 
         self.setLayout(layout)
-        
+
+        self.counter = count(0, 1)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.animation_speed = 100  # Default speed
@@ -143,31 +139,9 @@ class SignalView(QWidget):
 
     
     def update(self):
-        if self.loaded_signals and self.current_index < len(self.loaded_signals[0].getData()[0]):
+        if self.loaded_signals and self.current_index < len(self.loaded_signals[0]):
             for i in range(len(self.loaded_signals)):
-                self.y[i].append(self.loaded_signals[i].getData()[1][self.current_index])
-                self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
-
-                # Adjust x-axis limits to create a scrolling effect
-                if self.current_index >= self.x_max:
-                    self.x_min += 1
-                    self.x_max += 1
-
-            self.plot_widget.clear()
-            for i in range(len(self.loaded_signals)):
-                subset_curve = pg.PlotDataItem()
-                self.plot_widget.plot(self.x[i], self.y[i])
-
-            self.plot_widget.setXRange(self.x_min, self.x_max, padding=0)  # Set x-axis limits with no padding
-            self.current_index += 1
-            QApplication.processEvents()
-        else:
-            self.stop_animation()
-
-    def update_new(self):
-        if self.loaded_signals and self.current_index < len(self.loaded_signals[0].getData()[1]):
-            for i in range(len(self.loaded_signals)):
-                self.y[i].append(self.loaded_signals[i].getData()[i][self.current_index])
+                self.y[i].append(self.loaded_signals[i][self.current_index])
                 self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
 
                 # Adjust x-axis limits to create a scrolling effect
@@ -184,6 +158,7 @@ class SignalView(QWidget):
             QApplication.processEvents()
         else:
             self.stop_animation()
+
 
     def zoom_in(self):
         # Zoom in by adjusting x-axis limits (decrease window size)
@@ -235,7 +210,11 @@ class SignalView(QWidget):
         x_min += 50
         x_max += 50
         self.plot_widget.setXRange(x_min, x_max, padding=0)
-
+        
+    def run_in_thread(self):
+        self.update()
+        self.start_animation()
+        self.stop_animation()
 
     def load_new_csv(self):
         # Open a file dialog to select a file with supported extensions
@@ -287,51 +266,19 @@ class SignalView(QWidget):
                 # Unsupported file format
                 return
 
-            # Extract the signal data
+            # Extract the signal data and create a new PlotItem for it
             loaded_signal = df.iloc[:N, 0].tolist()
-            return loaded_signal
+            self.loaded_signals.append(loaded_signal)
+            self.x.append([])
+            self.y.append([])
 
+            plot_item = self.plot_widget.getPlotItem()
+            plot_item.setLabel('bottom', 'Time')
+            plot_item.setLabel('left', 'Amplitude')
+            plot_item.plot(pen='g')  # Create a new plot in the PlotItem
 
-    # Returns Selected Signal from plot
-    def return_selected_signal(self):
-        print('Signal Clicked!')
-        # selected_signal = self
+        self.start_animation()
 
-
-    # Adding a new signal to the view
-    def add_new_signal(self):
-        #Add legend to the PlotWidget
-        self.plot_widget.addLegend()
-        
-        # Load data from CSV file
-        signal_data = self.load_new_csv() 
-        
-        # Assign a random color from colors list
-        curve_color = random.choice(self.colors_list)
-        
-        # Create the signal object and add it to PlotWidget
-        # signal = pg.PlotDataItem(signal_data, pen = curve_color, name = curve_color + "_Signal", clickable = True )
-        signal = pg.PlotDataItem(signal_data, pen = curve_color, name = curve_color + "_Signal", clickable = True )
-        
-        # Return the signal that was clicked to be used by other methods
-        signal.sigClicked.connect(self.return_selected_signal)        
-        
-        
-        self.loaded_signals.append(signal)
-        self.plot_widget.addItem(signal)
-        
-        
-        # plot_item = self.plot_widget.getPlotItem()
-        # plot_item.setLabel('bottom', 'Time')
-        # plot_item.setLabel('left', 'Amplitude')
-        # plot_item.plot(pen='g')  # Create a new plot in the PlotItem
-
-        # self.loaded_signals.append(loaded_signal)
-        # self.x.append([])
-        # self.y.append([])
-        # self.start_animation()
-
-    
 
 def main():
     app = QApplication(sys.argv)

@@ -204,7 +204,8 @@ class SignalView(QWidget):
     def start_animation(self):
         # Calculate the animation interval based on the speed
         interval = int(1000 / self.animation_speed)  # Convert the interval to an integer
-        self.timer.start(interval)
+        # self.timer.start(interval)
+        self.timer.start(100)
         self.animation_running = True
         self.start_button.setChecked(False)
         self.start_button.setText('Stop Animation')

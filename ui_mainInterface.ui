@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainWindow_SignalViewer</class>
+ <widget class="QMainWindow" name="mainWindow_SignalViewer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>894</width>
+    <height>607</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QGroupBox" name="grpbx_signal_table">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>Plot Items</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QTableView" name="tbl_signals"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="grpbx_signal_viewers">
+        <property name="title">
+         <string>Signal View</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="grid_signal_viewers"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen_file">
+   <property name="text">
+    <string>Open file     Ctrl+O</string>
+   </property>
+   <property name="iconText">
+    <string>Open file</string>
+   </property>
+   <property name="toolTip">
+    <string>Open file     Ctrl+O</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>tbl_signals</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

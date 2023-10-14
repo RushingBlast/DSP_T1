@@ -11,12 +11,11 @@ class signalViewer(QWidget, Ui_viewer):
     def __init__(self):
         super(signalViewer, self).__init__()
         self.setupUi(self)
-        
         self.btn_play_pause.clicked.connect(lambda: print("Play/Pause Clicked!"))
         self.btn_openfile.clicked.connect(lambda: print("Open File Clicked!"))
         
         
-# app = QApplication(sys.argv)
-# signalV = signalViewer()
-# signalV.show()
-# app.exec()
+app = QApplication(sys.argv)
+signalV = signalViewer()
+signalV.show()
+app.exec()

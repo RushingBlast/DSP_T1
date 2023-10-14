@@ -145,7 +145,7 @@ class SignalView(QWidget):
     def update(self):
         if self.loaded_signals and self.current_index < len(self.loaded_signals[0].getData()[0]):
             for i in range(len(self.loaded_signals)):
-                self.y[i].append(self.loaded_signals[i].getData()[1][self.current_index])
+                self.y[i].append(self.loaded_signals[i].getData()[1][self.current_index]
                 self.x[i].append(self.current_index)  # Use the index as a simple time placeholder
 
                 # Adjust x-axis limits to create a scrolling effect
@@ -204,7 +204,8 @@ class SignalView(QWidget):
     def start_animation(self):
         # Calculate the animation interval based on the speed
         interval = int(1000 / self.animation_speed)  # Convert the interval to an integer
-        self.timer.start(interval)
+        # self.timer.start(interval)
+        self.timer.start(100)
         self.animation_running = True
         self.start_button.setChecked(False)
         self.start_button.setText('Stop Animation')
