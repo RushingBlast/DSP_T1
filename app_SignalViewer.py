@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 from ui_mainInterface import Ui_mainWindow_SignalViewer
-from class_SignalViewer_noPlotDataItem import SignalView
+from class_SignalViewerimport SignalView
 
 
 class appwindow(QMainWindow, Ui_mainWindow_SignalViewer):
@@ -60,17 +60,15 @@ class appwindow(QMainWindow, Ui_mainWindow_SignalViewer):
         
         
         # Setting up the main window
-        signal_viewer_1 = SignalView()
-        signal_viewer_1.setFocusPolicy(QtCore.Qt.StrongFocus)
-        signal_viewer_2 = SignalView()
+        signal_viewer_1 = SignalView(QtCore.Qt.Key.Key_Space, QtCore.Qt.Key.Key_Left,QtCore.Qt.Key.Key_Right,QtCore.Qt.Key.Key_Control + QtCore.Qt.Key.Key_O,QtCore.Qt.Key.Key_Control + QtCore.Qt.Key.Key_Up,QtCore.Qt.Key.Key_Control + QtCore.Qt.Key.Key_Down, self)
+        # signal_viewer_1.button_container.setFocusPolicy(QtCore.Qt.StrongFocus)
+        # signal_viewer_1.button_container.setFocus()
+        
+        signal_viewer_2 = SignalView(QtCore.Qt.Key.Key_Space, QtCore.Qt.Key.Key_Left,QtCore.Qt.Key.Key_Right,QtCore.Qt.Key.Key_Control + QtCore.Qt.Key.Key_O,QtCore.Qt.Key.Key_Control + QtCore.Qt.Key.Key_Up,QtCore.Qt.Key.Key_Control + QtCore.Qt.Key.Key_Down, self)
+        
         self.centralLayout = QtWidgets.QGridLayout()
         self.grid_signal_viewers.addWidget(signal_viewer_1)
         self.grid_signal_viewers.addWidget(signal_viewer_2)
-        # self.centralLayout.addWidget(signal_viewer_1)
-        # self.centralLayout.addWidget(signal_viewer_2)
-        # self.container.setLayout(self.centralLayout)
-        # appwindow.setCentralWidget(self,self.container)
-        
         
         # Prevent signal viewers from going past X=0 and Y=0      
         signal_viewer_1.plot_widget.setLimits(xMin = 0, yMin = -5)
