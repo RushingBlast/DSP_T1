@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout, QShortcut
 from PyQt5 import QtCore, QtGui, QtWidgets
-from class_SignalViewer import class_signal_viewer
+from class_signalViewer import class_signal_viewer
 import sys
 
 class main_window(QMainWindow):

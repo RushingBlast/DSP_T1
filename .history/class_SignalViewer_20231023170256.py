@@ -4,7 +4,7 @@ from sympy import Q
 from ui_signalViewer import Ui_Form
 import random
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout, QShortcut
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pandas as pd
 import pyqtgraph as pg
@@ -440,7 +440,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.timer.stop()
         self.animation_running = False
         self.btn_start_pause.setChecked(True)
-        self.btn_start_pause.setIcon(QIcon('icons\play.png'))
+        self.btn_start_pause.setText('Play Animation')
 
 # Toggle signal playback
     def toggle_animation(self):

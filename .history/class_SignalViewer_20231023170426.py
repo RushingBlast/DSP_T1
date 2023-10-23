@@ -440,7 +440,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.timer.stop()
         self.animation_running = False
         self.btn_start_pause.setChecked(True)
-        self.btn_start_pause.setIcon(QIcon('icons\play.png'))
+        self.btn_start_pause.setText('Play Animation')
 
 # Toggle signal playback
     def toggle_animation(self):
