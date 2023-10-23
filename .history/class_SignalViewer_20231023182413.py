@@ -74,20 +74,15 @@ class class_signal_viewer(QWidget, Ui_Form):
         
 ################################################      VIEW DETAILS      ################################################        
 
-        
-        
         self.view_widget.setLabel('bottom', 'Time')
         self.view_widget.setLabel('left', 'Amplitude')
         self.view_widget.setXRange(0,11,0)
         self.view_widget.setYRange(0,11,0)
-        self.horizontalScrollBar.setVisible(False)
-        self.verticalScrollBar.setVisible(False)
         self.view_widget.setMouseEnabled(x=False, y=False)
         self.btn_zoom_in.setEnabled(False)
         self.btn_zoom_out.setEnabled(False)
         self.lbl_speed.setText(f"Speed: {self.animation_speed}") 
         # self.view_widget.setAutoPan(x = True, y = False)
-        self.horizontalScrollBar.setRange(0, self.x_max)
 
 ################################################      SIGNAL CONNECTIONS      ################################################        
 
@@ -125,8 +120,6 @@ class class_signal_viewer(QWidget, Ui_Form):
 # SPEED CONTROL USING DIAL
         self.dial_speed.valueChanged.connect(self.update_speed)
 
-# Configure scroll bars when plot view range is changed
-        self.view_widget.sigRangeChanged.connect(self.update_scroll_bars)
 
 
 
@@ -135,67 +128,22 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Link View to another view
     def link_view_to(self, target_widget):
         self.is_linked = not self.is_linked
-
+        # vb = self.view_widget.getViewBox()
+        # vb.setAutoVisible(y=1.0)
         if self.is_linked:
-            # Notify the other widget that it's linked
-            target_widget.is_linked = True
-            
-            # Link both Views' ranges
             self.view_widget.getPlotItem().setXLink(target_widget.view_widget)
             self.view_widget.getPlotItem().setYLink(target_widget.view_widget)
-            
-            # Reset Animation
-            self.reset_animation()
-            target_widget.reset_animation()
-            
-            # Make View 1's controls control view 2
+            target_widget.wgt_viewer_controls.setEnabled(False)
             self.btn_start_pause.clicked.connect(target_widget.toggle_animation)
             target_widget.btn_start_pause.clicked.connect(self.toggle_animation)
-            self.btn_restart.clicked.connect(target_widget.reset_animation)
-            self.dial_speed.valueChanged.connect(lambda value: target_widget.dial_speed.setValue(value))
             
-            
-            
-            # Disable View 2's controls except signal modifications
-            target_widget.btn_start_pause.setEnabled(False)
-            target_widget.btn_restart.setEnabled(False)
-            target_widget.btn_link.setEnabled(False)
-            target_widget.btn_zoom_in.setEnabled(False)
-            target_widget.btn_zoom_out.setEnabled(False)
-            target_widget.dial_speed.setEnabled(False)
-            
-            # Ensure signal modifier buttons are enabled.
-            # target_widget.signal_buttons_set_enabled(True) # TEST LINE
         else: 
-            
-            # Unlink views
-            target_widget.is_linked = False
-            self.view_widget.getPlotItem().setXLink(self)
-            self.view_widget.getPlotItem().setYLink(self)
-            
-            # Split Controls
             self.btn_start_pause.clicked.disconnect(target_widget.toggle_animation)
-            self.btn_restart.clicked.disconnect(target_widget.reset_animation)
-            self.dial_speed.valueChanged.disconnect(target_widget.update_speed)
             target_widget.btn_start_pause.clicked.disconnect(self.toggle_animation)
-            
-            #Re-enable Controls
-            target_widget.btn_start_pause.setEnabled(True)
-            target_widget.btn_restart.setEnabled(True)
-            target_widget.btn_link.setEnabled(True)
-            target_widget.btn_zoom_in.setEnabled(True)
-            target_widget.btn_zoom_out.setEnabled(True)
-            
-            # target_widget.wgt_viewer_controls.setEnabled(True)
         
         if self.animation_running and not target_widget.animation_running:
             target_widget.toggle_animation()
 
-
-
-# Update scroll bars' ranges
-    def update_scroll_bars(self):
-        self.horizontalScrollBar.setRange(0, self.x_max)
 
 # Read csv files and save them in a list
     def read_signal_file(self):
@@ -339,7 +287,6 @@ class class_signal_viewer(QWidget, Ui_Form):
                 self.x_min += int(self.animation_speed)    
                 self.view_widget.setLimits(xMax = self.current_index)
             self.view_widget.setXRange(self.x_min, self.x_max)
-
             
             self.current_index += int(self.animation_speed) # Convert the speed value to integer
             QApplication.processEvents()
@@ -370,7 +317,7 @@ class class_signal_viewer(QWidget, Ui_Form):
             # Add the Clone to the target widget and set range automatically
             target_widget.add_to_loaded_signals(sent_signal)
             target_widget.view_widget.addItem(sent_signal)
-            # target_widget.view_widget.autoRange()
+            target_widget.view_widget.autoRange()
             self.selected_signal = None # Empty the selected_signal variable
             self.index_of_selected_signal = None
             
@@ -415,20 +362,22 @@ class class_signal_viewer(QWidget, Ui_Form):
         signal.sigClicked.connect(self.return_clicked_signal)
         
         
-  
+        vb = self.view_widget.getPlotItem().getViewBox()
+        vb.setAutoVisible()
+        
+
         # Enable plot widget mouse controls
         self.view_widget.setMouseEnabled(x=True, y=True)
         self.btn_zoom_in.setEnabled(True)
         self.btn_zoom_out.setEnabled(True)
         self.view_widget.setLimits(xMin=0)
-        self.horizontalScrollBar.valueChanged.connect(lambda value: self.view_widget.setXRange(value, value + (self.x_max - self.x_min)))
-        self.verticalScrollBar.valueChanged.connect(lambda value: self.view_widget.setYRange(value, value + (self.x_max - self.x_min)))        
+        self.horizontalScrollBar.valueChanged.connect(lambda value: self.view_widget.setXRange(value, value + 10))
+        self.verticalScrollBar.valueChanged.connect(lambda value: self.view_widget.setYRange(value, value + 10))        
         
-                
         #If animation is not running, start_animation
         if not self.animation_running:
             self.toggle_animation()
-
+            # self.view_widget.autoScale()
 
 
 # Update animation speed
@@ -445,8 +394,8 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.animation_running = True
         self.btn_start_pause.setChecked(False)
         self.btn_start_pause.setIcon(QIcon('icons\pause.png'))
-        # vb = self.view_widget.getPlotItem().getViewBox()
-        # vb.setAutoVisible(y = 1.0)
+        vb = self.view_widget.getPlotItem().getViewBox()
+        vb.setAutoVisible(y = 1.0)
         min_x, max_x, min_y, max_y = self.find_data_range()
 
         if max_x - min_x > 10000:
@@ -486,7 +435,7 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Reset Signal Playback
     def reset_animation(self):
         self.current_index = 0
-        self.view_widget.setXRange(0, 1000)
+        self.view_widget.setXRange(0, 50 * self.animation_speed)
         self.x_max = self.x_min = 0
 
 # Stops signal playback

@@ -339,7 +339,8 @@ class class_signal_viewer(QWidget, Ui_Form):
                 self.x_min += int(self.animation_speed)    
                 self.view_widget.setLimits(xMax = self.current_index)
             self.view_widget.setXRange(self.x_min, self.x_max)
-
+            self.horizontalScrollBar.setRange(0, self.x_max)
+            self.horizontalScrollBar.setValue(self.x_max)
             
             self.current_index += int(self.animation_speed) # Convert the speed value to integer
             QApplication.processEvents()
@@ -457,7 +458,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.view_widget.setLimits(yMin = min_y, yMax = max_y )
 
         # Auto range the view widget
-        self.view_widget.autoRange()
+        # self.view_widget.autoRange()
 
     # Function to find the data range of the loaded signals
     def find_data_range(self):
@@ -486,7 +487,7 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Reset Signal Playback
     def reset_animation(self):
         self.current_index = 0
-        self.view_widget.setXRange(0, 1000)
+        self.view_widget.setXRange(0, 50 * self.animation_speed)
         self.x_max = self.x_min = 0
 
 # Stops signal playback

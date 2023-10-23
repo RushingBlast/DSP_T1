@@ -7,6 +7,7 @@ class main_window(QMainWindow):
     def __init__(self):
         super(main_window, self).__init__()
         self.init_ui()
+        self.setMinimumSize(1200, 600)
 
     def init_ui(self):
 
@@ -27,7 +28,6 @@ class main_window(QMainWindow):
         signalMenu.addAction(self.renameAction)
         signalMenu.addAction(self.colorAction)
         
-        self.setMinimumSize(1200, 600)
 
         self.container = QWidget()
         self.layout = QtWidgets.QHBoxLayout()
@@ -38,6 +38,7 @@ class main_window(QMainWindow):
         self.container.setLayout(self.layout)
         self.setCentralWidget(self.container)
         signal_view_1.setFocus()
+        self.setMinimumSize(700, 500)
 
         # Setting up signal tranfer by linking views
         signal_view_1.btn_transfer.clicked.connect(lambda: signal_view_1.move_signal(signal_view_2))

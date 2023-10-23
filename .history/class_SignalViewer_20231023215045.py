@@ -152,7 +152,7 @@ class class_signal_viewer(QWidget, Ui_Form):
             self.btn_start_pause.clicked.connect(target_widget.toggle_animation)
             target_widget.btn_start_pause.clicked.connect(self.toggle_animation)
             self.btn_restart.clicked.connect(target_widget.reset_animation)
-            self.dial_speed.valueChanged.connect(lambda value: target_widget.dial_speed.setValue(value))
+            self.dial_speed.valueChanged.connect(target_widget.update_speed)
             
             
             
@@ -339,7 +339,8 @@ class class_signal_viewer(QWidget, Ui_Form):
                 self.x_min += int(self.animation_speed)    
                 self.view_widget.setLimits(xMax = self.current_index)
             self.view_widget.setXRange(self.x_min, self.x_max)
-
+            self.horizontalScrollBar.setRange(0, self.x_max)
+            self.horizontalScrollBar.setValue(self.x_max)
             
             self.current_index += int(self.animation_speed) # Convert the speed value to integer
             QApplication.processEvents()
@@ -415,7 +416,10 @@ class class_signal_viewer(QWidget, Ui_Form):
         signal.sigClicked.connect(self.return_clicked_signal)
         
         
-  
+        vb = self.view_widget.getPlotItem().getViewBox()
+        vb.setAutoVisible()
+        
+
         # Enable plot widget mouse controls
         self.view_widget.setMouseEnabled(x=True, y=True)
         self.btn_zoom_in.setEnabled(True)
@@ -445,8 +449,8 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.animation_running = True
         self.btn_start_pause.setChecked(False)
         self.btn_start_pause.setIcon(QIcon('icons\pause.png'))
-        # vb = self.view_widget.getPlotItem().getViewBox()
-        # vb.setAutoVisible(y = 1.0)
+        vb = self.view_widget.getPlotItem().getViewBox()
+        vb.setAutoVisible(y = 1.0)
         min_x, max_x, min_y, max_y = self.find_data_range()
 
         if max_x - min_x > 10000:
@@ -486,7 +490,7 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Reset Signal Playback
     def reset_animation(self):
         self.current_index = 0
-        self.view_widget.setXRange(0, 1000)
+        self.view_widget.setXRange(0, 50 * self.animation_speed)
         self.x_max = self.x_min = 0
 
 # Stops signal playback
