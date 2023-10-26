@@ -136,7 +136,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>icons/move.png</normaloff>icons/move.png</iconset>
+            <normaloff>icons/transfer.png</normaloff>icons/transfer.png</iconset>
           </property>
           <property name="iconSize">
            <size>

@@ -72,7 +72,7 @@ class Ui_Form(object):
         self.btn_transfer = QtWidgets.QPushButton(self.wgt_viewer_controls)
         self.btn_transfer.setText("")
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("icons/move.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap("icons/transfer.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btn_transfer.setIcon(icon5)
         self.btn_transfer.setIconSize(QtCore.QSize(40, 25))
         self.btn_transfer.setObjectName("btn_transfer")

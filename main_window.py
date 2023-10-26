@@ -1,5 +1,8 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout, QShortcut
+from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QKeySequence
+import numpy as np
 from class_SignalViewer import class_signal_viewer
 import sys
 
@@ -9,11 +12,12 @@ class main_window(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
+        self.linking_enabled = False
+        # Used to handle unlinking the x axis during signal playback
+        self.link_x_range_of_views = False
+        
 
-        
-        
-        # Test color
-         # Creating and setting menu bar
+        # Creating and setting menu bar
         menuBar = self.menuBar()
         self.setMenuBar(menuBar)
         
@@ -23,112 +27,135 @@ class main_window(QMainWindow):
         
         # Creating and adding Action to Signal Menu
         self.renameAction = QtWidgets.QAction("&Rename", self)
-        self.colorAction = QtWidgets.QAction("&Color", self)
         signalMenu.addAction(self.renameAction)
-        signalMenu.addAction(self.colorAction)
         
         self.setMinimumSize(1200, 600)
 
         self.container = QWidget()
         self.layout = QtWidgets.QHBoxLayout()
-        signal_view_1 = class_signal_viewer()
-        signal_view_2 = class_signal_viewer()
-        self.layout.addWidget(signal_view_1)
-        self.layout.addWidget(signal_view_2)
-        self.container.setLayout(self.layout)
+
+        self.signal_view_1 = class_signal_viewer(Qt.Key_O, Qt.Key_Z, Qt.Key_X, Qt.Key_C, Qt.Key_P, Qt.Key_R, Qt.Key_A, Qt.Key_D, Qt.Key_S)
+        self.signal_view_2 = class_signal_viewer(QKeySequence('shift+O'), QKeySequence('shift+Z'), QKeySequence('shift+X'), QKeySequence('shift+C'), QKeySequence('shift+P'), QKeySequence('shift+R'), QKeySequence('shift+A'), QKeySequence('shift+D'), QKeySequence('shift+S'))
+        self.layout.addWidget(self.signal_view_1)
+        self.layout.addWidget(self.signal_view_2)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.addLayout(self.layout)
         self.setCentralWidget(self.container)
-        signal_view_1.setFocus()
+        self.container.setLayout(self.verticalLayout)
+        self.signal_view_1.setFocus()
 
         # Setting up signal tranfer by linking views
-        signal_view_1.btn_transfer.clicked.connect(lambda: signal_view_1.move_signal(signal_view_2))
-        signal_view_2.btn_transfer.clicked.connect(lambda: signal_view_2.move_signal(signal_view_1))
+        self.signal_view_1.btn_transfer.clicked.connect(lambda: self.signal_view_1.move_signal(self.signal_view_2))
+        self.signal_view_2.btn_transfer.clicked.connect(lambda: self.signal_view_2.move_signal(self.signal_view_1))
+    
+        self.renameAction.triggered.connect(self.signal_view_1.rename_selected_signal)
         
-        signal_view_1.btn_link.clicked.connect(lambda: signal_view_1.link_view_to(signal_view_2))
-        signal_view_2.btn_link.clicked.connect(lambda: signal_view_1.link_view_to(signal_view_2))
-        self.renameAction.triggered.connect(signal_view_1.rename_selected_signal)
-        
-        
-
-        
-
+        self.signal_view_1.btn_link.clicked.connect(self.toggle_linking)
+        self.signal_view_2.btn_link.clicked.connect(self.toggle_linking)
         
         
 
 
 
 
-"""
+
 
     # Function the toggles Linking the views
     def toggle_linking(self):
+        # Toggle linking flag
         self.linking_enabled = not self.linking_enabled
         
-        # IF either of the views in playback. Start playback when linking
-        if signal_viewer_1.animation_running or signal_viewer_2.animation_running:
-            self.linked_animation_playback()
         if self.linking_enabled:
-            self.linkAction.setText("Unlink")
-            signal_viewer_1.start_button.clicked.disconnect(signal_viewer_1.toggle_animation)
-            signal_viewer_1.start_button.clicked.connect(self.linked_animation_playback)
-            # signal_viewer_2.start_button.clicked.connect(self.linked_animation_playback)
-            signal_viewer_2.button_container.setVisible(False)
-            signal_viewer_2.button_container.setEnabled(False)
+
+            # set is_linked flag in both views
+            self.signal_view_1.is_linked = self.signal_view_2.is_linked = True
+
+
+    # Change UI for linked mode
+            self.signal_view_2.wgt_viewer_controls.setVisible(False)
+            self.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
+
+            # Control view 2 with view 1's buttons
+            self.signal_view_1.btn_start_pause.clicked.disconnect(self.signal_view_1.toggle_animation)
+            self.signal_view_1.btn_start_pause.clicked.connect(self.linked_animation_playback)
+            self.signal_view_1.btn_clear.clicked.connect(self.signal_view_2.clear_signals)
+            self.signal_view_1.btn_restart.clicked.connect(self.signal_view_2.reset_animation)
+            self.signal_view_1.dial_speed.valueChanged.connect(lambda value: self.signal_view_2.dial_speed.setValue(value))
             
-            # Reset both views to prepare for linked playback
-            signal_viewer_1.clean_plot()
-            signal_viewer_2.clean_plot()
-            signal_viewer_1.toggle_animation()
-            signal_viewer_2.toggle_animation()
+            # Replay animation from start
+            self.signal_view_1.reset_animation()
+            self.signal_view_2.reset_animation()
+            self.signal_view_1.toggle_animation()
+            self.signal_view_2.toggle_animation()
             
-            minimum_x_max = np.minimum(signal_viewer_1.x_max, signal_viewer_2.x_max)
-            signal_viewer_1.x_min = signal_viewer_2.x_min
-            signal_viewer_1.x_max = signal_viewer_2.x_max = minimum_x_max
-            signal_viewer_1.plot_widget.autoRange()
-            
+            # Setup both views
+            self.signal_view_1.view_widget.setXRange(0, 1000)
+            self.signal_view_1.view_widget.setYRange(-1.3, 1.3)
+            self.signal_view_1.autoRange()
+            self.signal_view_2.autoRange()
+  
+
             
         else:
-            self.linkAction.setText("Link")
-            signal_viewer_1.start_button.clicked.disconnect(self.linked_animation_playback)
-            signal_viewer_1.start_button.clicked.connect(signal_viewer_1.toggle_animation)
-            signal_viewer_2.button_container.setVisible(True)
-            signal_viewer_2.button_container.setEnabled(True)
+            # set is_linked flag in both views
+            self.signal_view_1.is_linked = self.signal_view_2.is_linked = False
+
+            # Return controls to normal
+            self.signal_view_1.btn_restart.clicked.disconnect(self.signal_view_2.reset_animation)
+            self.signal_view_1.btn_clear.clicked.disconnect(self.signal_view_2.clear_signals)
+            self.signal_view_1.btn_start_pause.clicked.disconnect(self.linked_animation_playback)
+            self.signal_view_1.btn_start_pause.clicked.connect(self.signal_view_1.toggle_animation)
             
+            # Return UI to normal
+            self.signal_view_2.wgt_viewer_controls.setVisible(True)
+            self.signal_view_1.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
+            self.signal_view_1.dial_speed.valueChanged.disconnect(lambda value: self.signal_view_2.dial_speed.setValue(value))
+
+        # Functions to adjust view ranges
         self.update_plot1_x_range()
         self.update_plot2_x_range()
         self.update_plot1_y_range()
         self.update_plot2_y_range()
         QApplication.processEvents()
     
+    # Handles animation playback in linked mode
     def linked_animation_playback(self):
         self.link_x_range_of_views = not self.link_x_range_of_views
         if self.link_x_range_of_views:
-            signal_viewer_1.plot_widget.sigXRangeChanged.connect(self.update_plot1_x_range)
-            signal_viewer_2.plot_widget.sigXRangeChanged.connect(self.update_plot2_x_range)
+
+            self.signal_view_1.view_widget.sigYRangeChanged.connect(self.update_plot1_y_range)
+            self.signal_view_2.view_widget.sigYRangeChanged.connect(self.update_plot2_y_range)
+ 
+            self.signal_view_1.view_widget.sigXRangeChanged.connect(self.update_plot1_x_range)
+            self.signal_view_2.view_widget.sigXRangeChanged.connect(self.update_plot2_x_range)
         else:
-            
-            signal_viewer_1.plot_widget.sigXRangeChanged.disconnect(self.update_plot1_x_range)
-            signal_viewer_2.plot_widget.sigXRangeChanged.disconnect(self.update_plot2_x_range)
-        signal_viewer_1.toggle_animation()
-        signal_viewer_2.toggle_animation()
+ 
+            self.signal_view_1.view_widget.sigYRangeChanged.connect(self.update_plot1_y_range)
+            self.signal_view_2.view_widget.sigYRangeChanged.connect(self.update_plot2_y_range)
+ 
+            self.signal_view_1.view_widget.sigXRangeChanged.disconnect(self.update_plot1_x_range)
+            self.signal_view_2.view_widget.sigXRangeChanged.disconnect(self.update_plot2_x_range)
+        self.signal_view_1.toggle_animation()
+        self.signal_view_2.toggle_animation()
         
     def update_plot1_x_range(self):
         if self.linking_enabled:
-            signal_viewer_2.plot_widget.setXRange(*signal_viewer_1.plot_widget.viewRange()[0], padding = 0)
+            self.signal_view_2.view_widget.setXRange(*self.signal_view_1.view_widget.viewRange()[0], padding = 0)
     
     def update_plot2_x_range(self):
         if self.linking_enabled:    
-            signal_viewer_1.plot_widget.setXRange(*signal_viewer_2.plot_widget.viewRange()[0], padding = 0)
+            self.signal_view_1.view_widget.setXRange(*self.signal_view_2.view_widget.viewRange()[0], padding = 0)
 
     def update_plot1_y_range(self):
         if self.linking_enabled:    
-            signal_viewer_2.plot_widget.setYRange(*signal_viewer_1.plot_widget.viewRange()[1], padding = 0)
+            self.signal_view_2.view_widget.setYRange(*self.signal_view_1.view_widget.viewRange()[1], padding = 0)
     
     def update_plot2_y_range(self):
         if self.linking_enabled:    
-            signal_viewer_1.plot_widget.setYRange(*signal_viewer_2.plot_widget.viewRange()[1], padding = 0)
+            self.signal_view_1.view_widget.setYRange(*self.signal_view_2.view_widget.viewRange()[1], padding = 0)
         
 
-"""
+
 
 
 app = QApplication(sys.argv)

@@ -4,7 +4,6 @@ from sympy import Q
 from ui_signalViewer import Ui_Form
 import random
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout, QShortcut
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pandas as pd
@@ -34,7 +33,7 @@ import time
 
 """MAIN SIGNAL VIEWER WIDGET"""
 class class_signal_viewer(QWidget, Ui_Form):
-    def __init__(self,add_signal_btn, zoom_in_btn, zoom_out_btn, clear_btn, play_pause_btn, remove_btn, reset_btn, snapshot_btn, save_btn):
+    def __init__(self):
         super(class_signal_viewer, self).__init__()
         self.setupUi(self)
         self.btn_add_signal.setFocus()
@@ -46,11 +45,14 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.screenshots = []  # List to store the screenshots
         self.current_index= 0 # Index to iterate over the data to allow animated playback 
         self.selected_signal = any # Variable to store the selected signal object
-        self.index_of_selected_signal = None # Store the Index of the selected signal in the loaded_signals lis
+        self.index_of_selected_signal = None # Store the Index of the selected signal in the loaded_signals list
+        self.max_range = 0 #TODO - Check if this is needed anymore
+        self.last_reached_index = 0 #TODO - Check if this is needed anymore
         self.animation_running = False # Flag to handle animated playback
         self.animation_speed = 1 # Value that determines the amount by which current_index is incremented
         self.is_linked = False # Flag to track linking status
-
+        self.x = [[]] #TODO - Check if this is needed anymore
+        self.y = [[]] #TODO - Check if this is needed anymore
         
         self.x_min = 0
         self.x_max = 1000
@@ -59,7 +61,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.colors_list = self.colors_list = [
                                                 "red ", "blue ", "green", "yellow", "magenta",
                                                 "cyan", "orange", "purple", "pink", "lime", "teal", "maroon", "indigo"
-                                            ]
+                                            ] #TODO - Change to an actual random color generator
 
         # Set timer for update function
         self.timer = QtCore.QTimer(self)
@@ -68,62 +70,24 @@ class class_signal_viewer(QWidget, Ui_Form):
         # self.animation_speed = 100  # Default speed
         self.signal_buttons_set_enabled(False)
         
-################################################      SHORTCUTS      ################################################        
-# ADD_SIGNAL_BTN_SHORTCUTS        
-        self.btn_add_signal_shortcut = QShortcut(add_signal_btn, self)
-        self.btn_add_signal_shortcut.activated.connect(self.add_signal)
 
-# ZOOM_IN_BTN_SHORTCUTS
-        self.btn_zoom_in_shortcut = QShortcut(zoom_in_btn, self)
-        self.btn_zoom_in_shortcut.activated.connect(self.zoom_in)
-
-# ZOOM_OUT_BTN_SHORTCUTS
-        self.btn_zoom_out_shortcut = QShortcut(zoom_out_btn, self)
-        self.btn_zoom_out_shortcut.activated.connect(self.zoom_out)
-
-# CLEAR_BTN_SHORTCUTS
-        self.btn_clear_shortcut = QShortcut(clear_btn, self)
-        self.btn_clear_shortcut.activated.connect(self.clear_signals)
-
-# PLAY/PAUSE_BTN_SHORTCUTS
-        self.btn_play_pause_shortcut = QShortcut(play_pause_btn, self)
-        self.btn_play_pause_shortcut.activated.connect(self.toggle_animation)
-
-# REMOVE_BTN_SHORTCUTS
-        self.btn_remove_shortcut = QShortcut(remove_btn, self)
-        self.btn_remove_shortcut.activated.connect(self.remove_selected_signal)
-
-# RESET_BTN
-        self.btn_reset_shortcut = QShortcut(reset_btn, self)
-        self.btn_reset_shortcut.activated.connect(self.reset_animation)
-
-# Capture_Screenshots
-        self.btn_snapshot_shortcut = QShortcut(snapshot_btn, self)
-        self.btn_snapshot_shortcut.activated.connect(lambda: self.capture_screenshot(self.view_widget))
-
-# Save Screenshots as PDF
-        self.btn_save_shortcut = QShortcut(save_btn, self)
-        self.btn_save_shortcut.activated.connect(self.save_screenshots_as_pdf)
         
 ################################################      VIEW DETAILS      ################################################        
 
         
+        
         self.view_widget.setLabel('bottom', 'Time')
         self.view_widget.setLabel('left', 'Amplitude')
         self.view_widget.setXRange(0,11,0)
-        self.view_widget.setYRange(-1.3, 1.3,0)
-        self.view_widget.setLimits(yMin = -1.3, yMax = 1.3 )
+        self.view_widget.setYRange(0,11,0)
         self.horizontalScrollBar.setVisible(False)
         self.verticalScrollBar.setVisible(False)
         self.view_widget.setMouseEnabled(x=False, y=False)
-       
-       # Disable buttons except for Add_signal
         self.btn_zoom_in.setEnabled(False)
         self.btn_zoom_out.setEnabled(False)
-        self.btn_link.setEnabled(False)
-        self.btn_save.setEnabled(False)
-        self.btn_snapshot.setEnabled(False)
-        self.lbl_speed.setText(f"Speed: {self.animation_speed}")
+        self.lbl_speed.setText(f"Speed: {self.animation_speed}") 
+        # self.view_widget.setAutoPan(x = True, y = False)
+        self.horizontalScrollBar.setRange(0, self.x_max)
 
 ################################################      SIGNAL CONNECTIONS      ################################################        
 
@@ -141,7 +105,6 @@ class class_signal_viewer(QWidget, Ui_Form):
 
 # PLAY/PAUSE_BTN
         self.btn_start_pause.clicked.connect(self.toggle_animation)
-
 
 # REMOVE_BTN
         self.btn_remove.clicked.connect(self.remove_selected_signal)
@@ -162,11 +125,85 @@ class class_signal_viewer(QWidget, Ui_Form):
 # SPEED CONTROL USING DIAL
         self.dial_speed.valueChanged.connect(self.update_speed)
 
+# Configure scroll bars when plot view range is changed
+        self.view_widget.sigRangeChanged.connect(self.update_scroll_bars)
 
 
 
 ################################################      CLASS FUNCTIONS      ################################################
 
+# Link View to another view
+    def link_view_to(self, target_widget):
+        self.is_linked = not self.is_linked
+
+        if self.is_linked:
+            # Notify the other widget that it's linked
+            target_widget.is_linked = True
+            
+            # Link both Views' ranges
+            self.view_widget.getPlotItem().setXLink(target_widget.view_widget)
+            self.view_widget.getPlotItem().setYLink(target_widget.view_widget)
+            
+            # Reset Animation
+            self.reset_animation()
+            target_widget.reset_animation()
+            
+            # Make View 1's controls control view 2
+            self.btn_start_pause.clicked.connect(target_widget.toggle_animation)
+            target_widget.btn_start_pause.clicked.connect(self.toggle_animation)
+            self.btn_restart.clicked.connect(target_widget.reset_animation)
+            # self.dial_speed.valueChanged.connect(lambda value: target_widget.dial_speed.setValue(value))
+            self.dial_speed.valueChanged.connect(target_widget.set_animation_speed(self.dial_speed.value()))
+            
+            
+            
+            # Disable View 2's controls except signal modifications
+            target_widget.btn_start_pause.setEnabled(False)
+            target_widget.btn_restart.setEnabled(False)
+            target_widget.btn_link.setEnabled(False)
+            target_widget.btn_zoom_in.setEnabled(False)
+            target_widget.btn_zoom_out.setEnabled(False)
+            target_widget.dial_speed.setEnabled(False)
+            
+            self.view_widget.autoRange()
+            target_widget.view_widget.autoRange()
+            # Ensure signal modifier buttons are enabled.
+            # target_widget.signal_buttons_set_enabled(True) # TEST LINE
+        else: 
+            
+            # Unlink views
+            target_widget.is_linked = False
+            self.view_widget.getPlotItem().setXLink(None)
+            self.view_widget.getPlotItem().setYLink(None)
+            
+            # Split Controls
+            self.btn_start_pause.clicked.disconnect(target_widget.toggle_animation)
+            self.btn_restart.clicked.disconnect(target_widget.reset_animation)
+            # self.dial_speed.valueChanged.disconnect(target_widget.update_speed)
+            self.dial_speed.valueChanged.disconnect(lambda value: target_widget.dial_speed.setValue(value))
+            target_widget.btn_start_pause.clicked.disconnect(self.toggle_animation)
+            
+            #Re-enable Controls
+            target_widget.btn_start_pause.setEnabled(True)
+            target_widget.btn_restart.setEnabled(True)
+            target_widget.btn_link.setEnabled(True)
+            target_widget.btn_zoom_in.setEnabled(True)
+            target_widget.btn_zoom_out.setEnabled(True)
+            target_widget.dial_speed.setEnabled(True)
+            
+            # target_widget.wgt_viewer_controls.setEnabled(True)
+        
+        if self.animation_running and not target_widget.animation_running:
+            target_widget.toggle_animation()
+
+# set animation speed
+    def set_animation_speed(self, value):
+        self.animation_speed = value
+
+
+# # Update scroll bars' ranges
+#     def update_scroll_bars(self):
+#         self.horizontalScrollBar.setRange(0, self.x_max)
 
 # Read csv files and save them in a list
     def read_signal_file(self):
@@ -185,13 +222,17 @@ class class_signal_viewer(QWidget, Ui_Form):
         return data , stats
     
 # Appends a pg.PlotDataItem to loaded_signals
-    def add_to_loaded_signals(self, new_signal =pg.PlotDataItem):
+    def add_to_loaded_signals(self, new_signal = pg.PlotDataItem):
         self.loaded_signals.append(new_signal)
         
 # Returns the object's loaded_signals list
     def get_loaded_signals(self):
         return self.loaded_signals
     
+# TODO - Check necessity
+# Sets the current_index of the widget
+    def set_current_index(self, value):
+        self.current_index = value
 
 # Change color of selected signal
     def change_signal_color(self, new_color):
@@ -221,6 +262,7 @@ class class_signal_viewer(QWidget, Ui_Form):
     def rename_selected_signal(self):
         new_name, accept = QtWidgets.QInputDialog.getText(self, "Rename Signal", "Signal name: ")
         if new_name and accept:
+            self.loaded_signals[self.index_of_selected_signal].name = new_name 
             self.loaded_signals[self.index_of_selected_signal].opts['name'] = new_name 
             self.view_widget.addLegend().removeItem(self.selected_signal)
             self.view_widget.addLegend().addItem(self.selected_signal, new_name)
@@ -239,8 +281,8 @@ class class_signal_viewer(QWidget, Ui_Form):
             self.index_of_selected_signal = None
 
 
-# select Clicked signal
-    def select_clicked_signal(self):
+# Return Clicked signal
+    def return_clicked_signal(self):
         
         self.signal_buttons_set_enabled(True) # Enable signal-dependent buttons
 
@@ -254,6 +296,13 @@ class class_signal_viewer(QWidget, Ui_Form):
         # self.selected_signal = self.sender()
         self.index_of_selected_signal = self.loaded_signals.index(self.sender()) # Get index of selected signal in loaded signal
         self.selected_signal = self.loaded_signals[self.index_of_selected_signal] # Store the selected signal in a variable to be reused
+        
+
+
+        # TODO -  Remove this
+        signal_name = self.selected_signal.opts["name"]
+        print(f"selected {signal_name}")
+        print(f"Index of selected signal is: {self.index_of_selected_signal}")
 
         self.stats_of_selected_signal()
         # Iterate over loaded_signals to handle highlighting the selected signal
@@ -275,12 +324,15 @@ class class_signal_viewer(QWidget, Ui_Form):
     def remove_selected_signal(self):
         self.view_widget.removeItem(self.loaded_signals[self.index_of_selected_signal])
         self.view_widget.loaded_signals.remove(self.loaded_signals[self.index_of_selected_signal])
-
+        
+        #TODO - Remove This
+        print(len(self.loaded_signals))
+        
         self.signal_buttons_set_enabled(False)
 
 
 
-
+# TODO - Add something to handle a signal's data coming to an end
 # Update plot widget
     def update(self):
         if self.loaded_signals:
@@ -288,7 +340,9 @@ class class_signal_viewer(QWidget, Ui_Form):
             for curve in self.loaded_signals:
                 curve.setData(curve.original_data[0: self.current_index])              
             
-            if self.current_index > self.x_max:   
+            if self.current_index > self.x_max:
+                # self.x_max += int(self.animation_speed * 1.2)
+                # self.x_min += int(self.animation_speed * 0.8)    
                 self.x_max += int(self.animation_speed)
                 self.x_min += int(self.animation_speed)    
                 self.view_widget.setLimits(xMax = self.current_index)
@@ -324,6 +378,7 @@ class class_signal_viewer(QWidget, Ui_Form):
             # Add the Clone to the target widget and set range automatically
             target_widget.add_to_loaded_signals(sent_signal)
             target_widget.view_widget.addItem(sent_signal)
+            # target_widget.view_widget.autoRange()
             self.selected_signal = None # Empty the selected_signal variable
             self.index_of_selected_signal = None
             
@@ -365,20 +420,23 @@ class class_signal_viewer(QWidget, Ui_Form):
        
         self.add_to_loaded_signals(signal) #Adds the signal to the loaded_signals list
         self.view_widget.addItem(signal)
-        signal.sigClicked.connect(self.select_clicked_signal)
+        signal.sigClicked.connect(self.return_clicked_signal)
         
+        
+  
         # Enable plot widget mouse controls
         self.view_widget.setMouseEnabled(x=True, y=True)
-        self.btn_link.setEnabled(True)
         self.btn_zoom_in.setEnabled(True)
         self.btn_zoom_out.setEnabled(True)
         self.view_widget.setLimits(xMin=0)
-        self.btn_save.setEnabled(True)
-        self.btn_snapshot.setEnabled(True)      
+        self.horizontalScrollBar.valueChanged.connect(lambda value: self.view_widget.setXRange(value, value + (self.x_max - self.x_min)))
+        self.verticalScrollBar.valueChanged.connect(lambda value: self.view_widget.setYRange(value, value + (self.x_max - self.x_min)))        
+        
                 
         #If animation is not running, start_animation
         if not self.animation_running:
             self.toggle_animation()
+
 
 
 # Update animation speed
@@ -386,24 +444,24 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.animation_speed = self.dial_speed.value()
         self.lbl_speed.setText(f"Speed: {self.animation_speed}") # Update label text to show speed value
 
-
 # Starts signal playback
-    def start_animation(self):            
+    def start_animation(self):
         if not self.loaded_signals:
             return
-
+        
         self.timer.start(1)
         self.animation_running = True
         self.btn_start_pause.setChecked(False)
         self.btn_start_pause.setIcon(QIcon('icons\pause.png'))
+        # vb = self.view_widget.getPlotItem().getViewBox()
+        # vb.setAutoVisible(y = 1.0)
+        # min_x, max_x, min_y, max_y = self.find_data_range()
 
-        min_x, max_x, min_y, max_y = self.find_data_range()
+        # if max_x - min_x > 10000:
+        #     max_x = min_x + 10000
 
-        if max_x - min_x > 10000:
-            max_x = min_x + 10000
-
-        # Set the view range to show the first 10,000 points
-        self.view_widget.setXRange(min_x, max_x)
+        # # Set the view range to show the first 10,000 points
+        # self.view_widget.setXRange(min_x, max_x)
         # self.view_widget.setLimits(yMin = min_y, yMax = max_y )
 
         # Auto range the view widget
@@ -429,16 +487,15 @@ class class_signal_viewer(QWidget, Ui_Form):
 
         return min_x, max_x, min_y, max_y
 
-# # Resets View Range to X= 0 : 100
-#     def reset_view_range(self):
-#         self.view_widget.setXRange(0 , 100)
+# Resets View Range to X= 0 : 100
+    def reset_view_range(self):
+        self.view_widget.setXRange(0 , 100)
 
 # Reset Signal Playback
     def reset_animation(self):
         self.current_index = 0
         self.view_widget.setXRange(0, 1000)
-        self.x_min = 0
-        self.x_max = 1000
+        self.x_max = self.x_min = 0
 
 # Stops signal playback
     def stop_animation(self):
@@ -483,6 +540,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.view_widget.clear()
         self.loaded_signals.clear()
         self.current_index = 0 # Reset current_index to reset playback
+        self.reset_animation()
         self.signal_buttons_set_enabled(False)
         self.screenshots.clear() # Clear Screenshot queue
         if self.animation_running:
@@ -540,7 +598,7 @@ class class_signal_viewer(QWidget, Ui_Form):
             for group in grouped_screenshots:
                 # Create a list to hold the elements for each group of four screenshots
                 group_elements = []
-                group_elements.append(Spacer(0, 48)) # Add spacing before images in the beginning of each page
+                group_elements.append(Spacer(0, 38)) # Add spacing before images in the beginning of each page
                 for screenshot in group:
                     # Add the image to the group elements list
                     image_path = self.save_pixmap_as_image(screenshot)
@@ -562,19 +620,6 @@ class class_signal_viewer(QWidget, Ui_Form):
                 canvas.setFont("Helvetica", 10)
                 canvas.setFillColor(colors.black)
                 canvas.drawRightString(doc.pagesize[0] - 20, 20, text)
-                
-                # Add date/time
-                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                canvas.setFont("Helvetica", 10)
-                canvas.drawString(20, 20, f"Exported on: {timestamp}")
-
-
-                # Add headline
-                if page_num == 1:
-                    headline = "Report"
-                    canvas.setFont("Helvetica-Bold", 22)
-                    canvas.drawCentredString(doc.pagesize[0] / 2, doc.pagesize[1] - 70, headline)
-
                 canvas.restoreState()
 
                 # Draw a box page border
@@ -586,17 +631,8 @@ class class_signal_viewer(QWidget, Ui_Form):
                             stroke=True, fill=False)
 
             # Add the statistics table to the last page
-            elements.append(Spacer(0, 1))
-            
-            # Add the headline before the table
-            headline_text = "Signal Statistics:"
-            styles = getSampleStyleSheet()
-            headline = Paragraph(headline_text, styles['Heading2'])
-            elements.append(headline)
-     
-            elements.append(Spacer(0, 5))
-
-            table_data = [[' Signal Name ', '   Mean   ', 'Standard Dev.', '  Duration  ', ' Max. Value ', ' Min. Value ']]
+            elements.append(Spacer(0, 10))
+            table_data = [['Signal Name', 'Mean', 'Standard Deviation', 'Duration', 'Maximum Value', 'Minimum Value']]
             # table_data.extend(add the data here)
 
 
