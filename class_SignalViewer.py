@@ -1,10 +1,11 @@
 from os import name
+import typing
 
 from sympy import Q
 from ui_signalViewer import Ui_Form
 import random
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QGraphicsView, QDialog, QGridLayout, QShortcut
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pandas as pd
@@ -28,7 +29,8 @@ import time
      
         
         
-
+class MySignalEmitter(QObject):
+    sigPlotClicked = pyqtSignal()
 
 
 
@@ -42,6 +44,7 @@ class class_signal_viewer(QWidget, Ui_Form):
 
 ################################################      CLASS VARIABLES      ################################################
         
+        self.signal_emitter = MySignalEmitter()
         
         self.screenshots = []  # List to store the screenshots
         self.current_index= 0 # Index to iterate over the data to allow animated playback 
@@ -101,9 +104,9 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.btn_snapshot_shortcut = QShortcut(snapshot_btn, self)
         self.btn_snapshot_shortcut.activated.connect(lambda: self.capture_screenshot(self.view_widget))
 
-# Save Screenshots as PDF
-        self.btn_save_shortcut = QShortcut(save_btn, self)
-        self.btn_save_shortcut.activated.connect(self.save_screenshots_as_pdf)
+# # Save Screenshots as PDF
+#         self.btn_save_shortcut = QShortcut(save_btn, self)
+#         self.btn_save_shortcut.activated.connect(self.save_screenshots_as_pdf)
         
 ################################################      VIEW DETAILS      ################################################        
 
@@ -121,7 +124,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.btn_zoom_in.setEnabled(False)
         self.btn_zoom_out.setEnabled(False)
         self.btn_link.setEnabled(False)
-        self.btn_save.setEnabled(False)
+        # self.btn_save.setEnabled(False)
         self.btn_snapshot.setEnabled(False)
         self.lbl_speed.setText(f"Speed: {self.animation_speed}")
 
@@ -153,7 +156,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.btn_snapshot.clicked.connect(lambda: self.capture_screenshot(self.view_widget))
 
 # Save Screenshots as PDF
-        self.btn_save.clicked.connect(self.save_screenshots_as_pdf)
+        # self.btn_save.clicked.connect(self.save_screenshots_as_pdf)
         # self.btn_save.clicked.connect(self.msg_pdf_created)
 
 # Change signal color
@@ -161,6 +164,7 @@ class class_signal_viewer(QWidget, Ui_Form):
 
 # SPEED CONTROL USING DIAL
         self.dial_speed.valueChanged.connect(self.update_speed)
+        
 
 
 
@@ -176,22 +180,13 @@ class class_signal_viewer(QWidget, Ui_Form):
         path = str(Path(filename))
         pandas_data = pd.read_csv(path).iloc[:, 0]
         data = pandas_data.to_numpy()
-        data_mean = np.mean(data)
-        data_median = np.median(data)
-        data_std = np.std(data)
-        data_max = np.max(data)
-        data_min = np.min(data)
-        stats = (data_mean, data_median, data_std, data_max, data_min)
-        return data , stats
+        return data
     
 # Appends a pg.PlotDataItem to loaded_signals
     def add_to_loaded_signals(self, new_signal =pg.PlotDataItem):
         self.loaded_signals.append(new_signal)
         
-# Returns the object's loaded_signals list
-    def get_loaded_signals(self):
-        return self.loaded_signals
-    
+  
 
 # Change color of selected signal
     def change_signal_color(self, new_color):
@@ -219,6 +214,17 @@ class class_signal_viewer(QWidget, Ui_Form):
 
 # Rename selected signal
     def rename_selected_signal(self):
+
+        if self.selected_signal is None:
+            error_msg = QtWidgets.QMessageBox(self)
+            error_msg.setIcon(QtWidgets.QMessageBox.Critical)
+            error_msg.setWindowTitle("Error!")
+            error_msg.setText("Please select a signal to rename!")
+            error_msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            error_msg.exec()
+            return
+
+
         new_name, accept = QtWidgets.QInputDialog.getText(self, "Rename Signal", "Signal name: ")
         if new_name and accept:
             self.loaded_signals[self.index_of_selected_signal].opts['name'] = new_name 
@@ -229,19 +235,11 @@ class class_signal_viewer(QWidget, Ui_Form):
             
 
 
-# Handle clicking in an empty space to deselect signals
-    def deselect_signal(self):
-        if len(self.loaded_signals) != 0: # Check if there are signals loaded
-            # Iterate over loaded signals, setting their width to zero to 'deselct'
-            for signal in self.loaded_signals:
-                signal.setPen(signal.color, width = 0)
-            self.selected_signal = None
-            self.index_of_selected_signal = None
-
-
 # select Clicked signal
     def select_clicked_signal(self):
         
+        self.signal_emitter.sigPlotClicked.emit()
+
         self.signal_buttons_set_enabled(True) # Enable signal-dependent buttons
 
         #If the selected signal is clicked again: deselect and disable corresponding buttons
@@ -255,7 +253,6 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.index_of_selected_signal = self.loaded_signals.index(self.sender()) # Get index of selected signal in loaded signal
         self.selected_signal = self.loaded_signals[self.index_of_selected_signal] # Store the selected signal in a variable to be reused
 
-        self.stats_of_selected_signal()
         # Iterate over loaded_signals to handle highlighting the selected signal
         for signal in self.loaded_signals:
             # Find the selected 
@@ -263,7 +260,20 @@ class class_signal_viewer(QWidget, Ui_Form):
                 signal.setPen(signal.color, width= 0)
             else:
                 signal.setPen(signal.color, width= 5)
+
+# Handle clicking in an empty space to deselect signals
+    def deselect_signal(self):
+        if len(self.loaded_signals) != 0: # Check if there are signals loaded
+            # Iterate over loaded signals, setting their width to zero to 'deselct'
+            for signal in self.loaded_signals:
+                signal.setPen(signal.color, width = 0)
+            self.selected_signal = None
+            self.index_of_selected_signal = None
+
        
+    
+
+
 # Function to enable/disable buttons that need a signal to be selected
     def signal_buttons_set_enabled(self, flag):
         self.btn_change_color.setEnabled(flag)
@@ -352,16 +362,13 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.view_widget.addLegend()
         curve_color = random.choice(self.colors_list)
         
-        data, stats = self.read_signal_file()
+        data = self.read_signal_file()
         
         # Initialize loaded signal
         signal = pg.PlotDataItem(data, pen = curve_color, name = "Signal_"+ str(len(self.loaded_signals)) ,clickable=True , radius = 5)
         signal.color = curve_color # Holds the color assigned to the signal at creation
         signal.original_data = data # hold the original data of the signal
         
-        # Holds Signal's data statistics.
-        # (mean, median, std, max, min)
-        signal.stats = stats
        
         self.add_to_loaded_signals(signal) #Adds the signal to the loaded_signals list
         self.view_widget.addItem(signal)
@@ -373,7 +380,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.btn_zoom_in.setEnabled(True)
         self.btn_zoom_out.setEnabled(True)
         self.view_widget.setLimits(xMin=0)
-        self.btn_save.setEnabled(True)
+        # self.btn_save.setEnabled(True)
         self.btn_snapshot.setEnabled(True)      
                 
         #If animation is not running, start_animation
@@ -507,9 +514,18 @@ class class_signal_viewer(QWidget, Ui_Form):
         msg.exec()
 
 
+    def calculate_stats(self, data, end_val):
+        data_mean = np.mean(data[0: end_val])
+        data_median = np.median(data[0: end_val])
+        data_std = np.std(data[0: end_val])
+        data_max = np.max(data[0: end_val])
+        data_min = np.min(data[0: end_val])
+        stats = (data_mean, data_median, data_std, data_max, data_min)
+        return stats
+
 
 # Saving screenshot as pdf
-    def save_screenshots_as_pdf(self):
+    def save_screenshots_as_pdf(self , extra_screenshots = [], extra_signals = []):
         if not self.screenshots:  # No screenshots to save
             error_msg = QtWidgets.QMessageBox(self)
             error_msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -519,6 +535,21 @@ class class_signal_viewer(QWidget, Ui_Form):
             error_msg.exec()
             return
         try:
+
+            list_of_signals = self.loaded_signals
+
+            print(len(list_of_signals))
+
+
+            # Append the extra screenshoots if present
+            if len(extra_screenshots) != 0:
+                self.screenshots.extend(extra_screenshots)
+            
+            # Append the extra signals if present
+            if len(extra_signals) != 0:
+                list_of_signals.extend(extra_signals)
+
+
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             unique_id = str(uuid.uuid4().hex[:8]) # Generate a unique identifier
             pdf_filename = f"report_{timestamp}_{unique_id}.pdf"
@@ -567,7 +598,7 @@ class class_signal_viewer(QWidget, Ui_Form):
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 canvas.setFont("Helvetica", 10)
                 canvas.drawString(20, 20, f"Exported on: {timestamp}")
-
+            
 
                 # Add headline
                 if page_num == 1:
@@ -597,12 +628,12 @@ class class_signal_viewer(QWidget, Ui_Form):
             elements.append(Spacer(0, 5))
 
             table_data = [[' Signal Name ', '   Mean   ', 'Standard Dev.', '  Duration  ', ' Max. Value ', ' Min. Value ']]
-            # table_data.extend(add the data here)
 
 
             # Iterate over loaded signals to fill table            
-            for signal in self.loaded_signals:
-                table_data.extend([[signal.opts['name'], round(signal.stats[0], 2), round(signal.stats[2], 2), f"{len(signal.original_data)} ms", round(signal.stats[3], 2), round(signal.stats[4], 2)]])
+            for signal in list_of_signals:
+                signal_stats = self.calculate_stats(signal.getData(), self.current_index)
+                table_data.extend([[signal.opts['name'], round(signal_stats[0], 2), round(signal_stats[2], 2), f"{len(signal.getData())} ms", round(signal_stats[3], 2), round(signal_stats[4], 2)]])
 
 
             table = Table(table_data)
@@ -623,13 +654,16 @@ class class_signal_viewer(QWidget, Ui_Form):
             doc.build(elements, onFirstPage=draw_page_number, onLaterPages=draw_page_number)
 
 
-        except: # Display notification that PDF couldn't be created
+        except Exception as e: # Display notification that PDF couldn't be created
             failed_msg = QtWidgets.QMessageBox(self)
             failed_msg.setIcon(QtWidgets.QMessageBox.Critical)
             failed_msg.setWindowTitle("Error!")
             failed_msg.setText("Coudn't create PDF!")
             failed_msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
             failed_msg.exec()
+            
+            # Print exception
+            print(e)
             return
         # Notification that PDF was created successfully
         self.msg_pdf_created()

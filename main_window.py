@@ -15,20 +15,29 @@ class main_window(QMainWindow):
         self.linking_enabled = False
         # Used to handle unlinking the x axis during signal playback
         self.link_x_range_of_views = False
-        
 
+        self.activeWidget = None
+        
         # Creating and setting menu bar
         menuBar = self.menuBar()
         self.setMenuBar(menuBar)
         
         # Create Signals menu
-        signalMenu = QtWidgets.QMenu("&Signal", self)
+        signalMenu = QtWidgets.QMenu("&File", self)
         menuBar.addMenu(signalMenu)
         
-        # Creating and adding Action to Signal Menu
+        # Add open action to File Menu
+        self.openAction = QtWidgets.QAction("&Open", self)
+        signalMenu.addAction(self.openAction)
+        
+        # Adding rename action to File Menu
         self.renameAction = QtWidgets.QAction("&Rename", self)
         signalMenu.addAction(self.renameAction)
-        
+
+        # Adding Export action to File Menu
+        self.exportAction = QtWidgets.QAction("&Export PDF", self)
+        signalMenu.addAction(self.exportAction)
+
         self.setMinimumSize(1200, 600)
 
         self.container = QWidget()
@@ -48,15 +57,53 @@ class main_window(QMainWindow):
         self.signal_view_1.btn_transfer.clicked.connect(lambda: self.signal_view_1.move_signal(self.signal_view_2))
         self.signal_view_2.btn_transfer.clicked.connect(lambda: self.signal_view_2.move_signal(self.signal_view_1))
     
-        self.renameAction.triggered.connect(self.signal_view_1.rename_selected_signal)
+        self.openAction.triggered.connect(self.signal_view_1.add_signal)
+        self.exportAction.triggered.connect(lambda: self.signal_view_1.save_screenshots_as_pdf(self.signal_view_2.screenshots, self.signal_view_2.loaded_signals))
+        self.renameAction.triggered.connect(self.rename_active_widget)
+        
+        
+        self.signal_view_1.signal_emitter.sigPlotClicked.connect(self.signal_view_2.deselect_signal)
+        self.signal_view_1.signal_emitter.sigPlotClicked.connect(lambda: self.mark_active_widget(self.signal_view_1))
+        self.signal_view_2.signal_emitter.sigPlotClicked.connect(self.signal_view_1.deselect_signal)
+        self.signal_view_2.signal_emitter.sigPlotClicked.connect(lambda: self.mark_active_widget(self.signal_view_2))
         
         self.signal_view_1.btn_link.clicked.connect(self.toggle_linking)
         self.signal_view_2.btn_link.clicked.connect(self.toggle_linking)
         
+    
+    def mark_active_widget(self, widget):
+        self.activeWidget = widget
+    
+    def rename_active_widget(self):
+        self.activeWidget.rename_selected_signal()
+
+    # Funtion to check two signals are selected at once and returns the widget appropriate widget
+    def check_for_selected_signals(self):
+        # If a signal is selected in both views return 0
+        if self.signal_view_1.selected_signal is not None and self.signal_view_2.selected_signal is not None:
+            return False
         
+        # If 
+        elif self.signal_view_1.selected_signal is not None:
+            return True 
+        
+        elif self.signal_view_2.selected_signal is not None:
+            return True
 
-
-
+    
+# Rename selected signal
+    def rename_selected_signal(self):
+        print ("Rename triggered")
+        if len(Selected_Signals) == 1 :
+            new_name, accept = QtWidgets.QInputDialog.getText(self, "Rename Signal", "Signal name: ")
+            if new_name and accept:
+                self.loaded_signals[self.index_of_selected_signal].opts['name'] = new_name 
+                self.view_widget.addLegend().removeItem(self.selected_signal)
+                self.view_widget.addLegend().addItem(self.selected_signal, new_name)
+                self.deselect_signal()
+        else:
+            return
+        
 
 
 
@@ -72,12 +119,21 @@ class main_window(QMainWindow):
 
 
     # Change UI for linked mode
-            self.signal_view_2.wgt_viewer_controls.setVisible(False)
-            self.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
+            # self.signal_view_2.wgt_viewer_controls.setVisible(False)
+            # self.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
+            self.signal_view_2.btn_add_signal.setEnabled(False)
+            self.signal_view_2.btn_link.setEnabled(False)
+            self.signal_view_2.btn_restart.setEnabled(False)
+            self.signal_view_2.btn_start_pause.setEnabled(False)
+            self.signal_view_2.btn_zoom_out.setEnabled(False)
+            self.signal_view_2.btn_zoom_in.setEnabled(False)
 
             # Control view 2 with view 1's buttons
             self.signal_view_1.btn_start_pause.clicked.disconnect(self.signal_view_1.toggle_animation)
             self.signal_view_1.btn_start_pause.clicked.connect(self.linked_animation_playback)
+            self.signal_view_1.btn_play_pause_shortcut.activated.disconnect(self.signal_view_1.toggle_animation)
+            self.signal_view_1.btn_play_pause_shortcut.activated.connect(self.linked_animation_playback)
+
             self.signal_view_1.btn_clear.clicked.connect(self.signal_view_2.clear_signals)
             self.signal_view_1.btn_restart.clicked.connect(self.signal_view_2.reset_animation)
             self.signal_view_1.dial_speed.valueChanged.connect(lambda value: self.signal_view_2.dial_speed.setValue(value))
@@ -91,11 +147,9 @@ class main_window(QMainWindow):
             # Setup both views
             self.signal_view_1.view_widget.setXRange(0, 1000)
             self.signal_view_1.view_widget.setYRange(-1.3, 1.3)
-            self.signal_view_1.autoRange()
-            self.signal_view_2.autoRange()
+
   
 
-            
         else:
             # set is_linked flag in both views
             self.signal_view_1.is_linked = self.signal_view_2.is_linked = False
@@ -105,11 +159,19 @@ class main_window(QMainWindow):
             self.signal_view_1.btn_clear.clicked.disconnect(self.signal_view_2.clear_signals)
             self.signal_view_1.btn_start_pause.clicked.disconnect(self.linked_animation_playback)
             self.signal_view_1.btn_start_pause.clicked.connect(self.signal_view_1.toggle_animation)
-            
+            self.signal_view_1.btn_play_pause_shortcut.activated.connect(self.signal_view_1.toggle_animation)
+            self.signal_view_1.btn_play_pause_shortcut.activated.disconnect(self.linked_animation_playback)
             # Return UI to normal
-            self.signal_view_2.wgt_viewer_controls.setVisible(True)
-            self.signal_view_1.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
-            self.signal_view_1.dial_speed.valueChanged.disconnect(lambda value: self.signal_view_2.dial_speed.setValue(value))
+            self.signal_view_2.btn_restart.setEnabled(True)
+            self.signal_view_2.btn_add_signal.setEnabled(True)
+            self.signal_view_2.btn_link.setEnabled(True)
+            self.signal_view_2.btn_start_pause.setEnabled(True)
+            self.signal_view_2.btn_zoom_out.setEnabled(True)
+            self.signal_view_2.btn_zoom_in.setEnabled(True)
+            # self.signal_view_2.wgt_viewer_controls.setVisible(True)
+            # self.signal_view_1.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
+            self.signal_view_1.dial_speed.valueChanged.disconnect()
+            self.signal_view_1.dial_speed.valueChanged.connect(self.signal_view_1.update_speed)
 
         # Functions to adjust view ranges
         self.update_plot1_x_range()
