@@ -22,6 +22,9 @@
         <property name="toolTip">
          <string>Open File</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -51,6 +54,9 @@
         <property name="toolTip">
          <string>Remove Signal</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -71,6 +77,9 @@
         <property name="toolTip">
          <string>Move Signal</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -90,6 +99,9 @@
        <widget class="QPushButton" name="btn_clear">
         <property name="toolTip">
          <string>Clear All</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>4</number>
         </property>
         <property name="text">
          <string/>
@@ -150,6 +162,9 @@
         <property name="toolTip">
          <string>Play/Pause</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -173,6 +188,9 @@
         <property name="toolTip">
          <string>Rewind</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -193,6 +211,9 @@
         <property name="toolTip">
          <string>Recolor Signal</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -212,6 +233,9 @@
        <widget class="QPushButton" name="btn_link">
         <property name="toolTip">
          <string>Link Views</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>4</number>
         </property>
         <property name="text">
          <string/>
@@ -236,6 +260,9 @@
         <property name="toolTip">
          <string>Zoom In</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -259,6 +286,9 @@
         <property name="toolTip">
          <string>Zoom out</string>
         </property>
+        <property name="toolTipDuration">
+         <number>4</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -281,6 +311,9 @@
        <widget class="QPushButton" name="btn_snapshot">
         <property name="toolTip">
          <string>Take Snapshot</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>4</number>
         </property>
         <property name="text">
          <string/>

@@ -26,12 +26,12 @@ class main_window(QMainWindow):
         signalMenu = QtWidgets.QMenu("&File", self)
         menuBar.addMenu(signalMenu)
         
-        # # Add open action to File Menu
-        # self.openAction = QtWidgets.QAction("&Open", self)
-        # signalMenu.addAction(self.openAction)
+        # Add open action to File Menu
+        self.openAction = QtWidgets.QAction("&Open", self)
+        signalMenu.addAction(self.openAction)
         
         # Adding rename action to File Menu
-        self.renameAction = QtWidgets.QAction("&Rename Signal", self)
+        self.renameAction = QtWidgets.QAction("&Rename", self)
         signalMenu.addAction(self.renameAction)
 
         # Adding Export action to File Menu
@@ -92,11 +92,11 @@ class main_window(QMainWindow):
 
             self.signal_view_1.view_widget.setXLink(self.signal_view_2.view_widget)
             self.signal_view_1.view_widget.setYLink(self.signal_view_2.view_widget)
-            
-            self.signal_view_2.current_index = self.signal_view_1.current_index
         
 
          # Change UI for linked mode
+            # self.signal_view_2.wgt_viewer_controls.setVisible(False)
+            # self.verticalLayout.addWidget(self.signal_view_1.wgt_viewer_controls)
             self.signal_view_2.btn_add_signal.setEnabled(False)
             self.signal_view_2.btn_link.setEnabled(False)
             self.signal_view_2.btn_restart.setEnabled(False)
@@ -105,14 +105,19 @@ class main_window(QMainWindow):
             self.signal_view_2.btn_zoom_in.setEnabled(False)
 
         # Control view 2 with view 1's buttons
+            # self.signal_view_1.btn_start_pause.clicked.disconnect(self.signal_view_1.toggle_animation)
+            # self.signal_view_1.btn_start_pause.clicked.connect(self.linked_animation_playback)
             self.signal_view_1.btn_start_pause.clicked.connect(self.signal_view_2.toggle_animation)
+            # self.signal_view_1.btn_play_pause_shortcut.activated.disconnect(self.signal_view_1.toggle_animation)
+            # self.signal_view_1.btn_play_pause_shortcut.activated.connect(self.linked_animation_playback)
 
             self.signal_view_1.btn_clear.clicked.connect(self.signal_view_2.clear_signals)
             self.signal_view_1.btn_restart.clicked.connect(self.signal_view_2.reset_animation)
             self.signal_view_1.dial_speed.valueChanged.connect(lambda value: self.signal_view_2.dial_speed.setValue(value))
             
             # Toggle animation if either of the two plots was already running
-            
+            # self.signal_view_1.reset_animation()
+            # self.signal_view_2.reset_animation()
             if self.signal_view_1.animation_running or self.signal_view_2.animation_running:
                 self.signal_view_1.start_animation()
                 self.signal_view_2.start_animation()
@@ -154,6 +159,44 @@ class main_window(QMainWindow):
 
     
         QApplication.processEvents()
+    
+    # Handles animation playback in linked mode
+    def linked_animation_playback(self):
+        self.link_x_range_of_views = not self.link_x_range_of_views
+        if self.link_x_range_of_views:
+
+            self.signal_view_1.view_widget.sigYRangeChanged.connect(self.update_plot1_y_range)
+            self.signal_view_2.view_widget.sigYRangeChanged.connect(self.update_plot2_y_range)
+ 
+            self.signal_view_1.view_widget.sigXRangeChanged.connect(self.update_plot1_x_range)
+            self.signal_view_2.view_widget.sigXRangeChanged.connect(self.update_plot2_x_range)
+        else:
+ 
+            self.signal_view_1.view_widget.sigYRangeChanged.connect(self.update_plot1_y_range)
+            self.signal_view_2.view_widget.sigYRangeChanged.connect(self.update_plot2_y_range)
+ 
+            self.signal_view_1.view_widget.sigXRangeChanged.disconnect(self.update_plot1_x_range)
+            self.signal_view_2.view_widget.sigXRangeChanged.disconnect(self.update_plot2_x_range)
+        self.signal_view_1.toggle_animation()
+        self.signal_view_2.toggle_animation()
+        
+    def update_plot1_x_range(self):
+        if self.linking_enabled:
+            self.signal_view_2.view_widget.setXRange(*self.signal_view_1.view_widget.viewRange()[0], padding = 0)
+    
+    def update_plot2_x_range(self):
+        if self.linking_enabled:    
+            self.signal_view_1.view_widget.setXRange(*self.signal_view_2.view_widget.viewRange()[0], padding = 0)
+
+    def update_plot1_y_range(self):
+        if self.linking_enabled:    
+            self.signal_view_2.view_widget.setYRange(*self.signal_view_1.view_widget.viewRange()[1], padding = 0)
+    
+    def update_plot2_y_range(self):
+        if self.linking_enabled:    
+            self.signal_view_1.view_widget.setYRange(*self.signal_view_2.view_widget.viewRange()[1], padding = 0)
+        
+
 
 
 

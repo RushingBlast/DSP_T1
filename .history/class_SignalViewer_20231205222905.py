@@ -159,6 +159,10 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Capture_Screenshots
         self.btn_snapshot.clicked.connect(lambda: self.capture_screenshot(self.view_widget))
 
+# Save Screenshots as PDF
+        # self.btn_save.clicked.connect(self.save_screenshots_as_pdf)
+        # self.btn_save.clicked.connect(self.msg_pdf_created)
+
 # Change signal color
         self.btn_change_color.clicked.connect(self.change_signal_color)
 
@@ -284,16 +288,12 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Remove Signal from Plot
     def remove_selected_signal(self):
         self.view_widget.removeItem(self.loaded_signals[self.index_of_selected_signal])
-        self.loaded_signals.remove(self.loaded_signals[self.index_of_selected_signal])
+        self.view_widget.loaded_signals.remove(self.loaded_signals[self.index_of_selected_signal])
 
-        if len(self.loaded_signals) == 0:
-            self.stop_animation()
-            self.reset_animation()
-        
         self.signal_buttons_set_enabled(False)
 
 
-
+pg.PlotWidget.
 
 # Update plot widget
     def update(self):
@@ -443,6 +443,9 @@ class class_signal_viewer(QWidget, Ui_Form):
 
         return min_x, max_x, min_y, max_y
 
+# # Resets View Range to X= 0 : 100
+#     def reset_view_range(self):
+#         self.view_widget.setXRange(0 , 100)
 
 # Reset Signal Playback
     def reset_animation(self):
@@ -450,10 +453,6 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.view_widget.setXRange(0, 1000)
         self.x_min = 0
         self.x_max = 1000
-        if self.animation_running:
-            self.start_animation()
-        else: 
-            self.stop_animation()
 
 # Stops signal playback
     def stop_animation(self):

@@ -159,6 +159,10 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Capture_Screenshots
         self.btn_snapshot.clicked.connect(lambda: self.capture_screenshot(self.view_widget))
 
+# Save Screenshots as PDF
+        # self.btn_save.clicked.connect(self.save_screenshots_as_pdf)
+        # self.btn_save.clicked.connect(self.msg_pdf_created)
+
 # Change signal color
         self.btn_change_color.clicked.connect(self.change_signal_color)
 

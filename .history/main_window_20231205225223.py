@@ -26,12 +26,12 @@ class main_window(QMainWindow):
         signalMenu = QtWidgets.QMenu("&File", self)
         menuBar.addMenu(signalMenu)
         
-        # # Add open action to File Menu
-        # self.openAction = QtWidgets.QAction("&Open", self)
-        # signalMenu.addAction(self.openAction)
+        # Add open action to File Menu
+        self.openAction = QtWidgets.QAction("&Open", self)
+        signalMenu.addAction(self.openAction)
         
         # Adding rename action to File Menu
-        self.renameAction = QtWidgets.QAction("&Rename Signal", self)
+        self.renameAction = QtWidgets.QAction("&Rename", self)
         signalMenu.addAction(self.renameAction)
 
         # Adding Export action to File Menu
