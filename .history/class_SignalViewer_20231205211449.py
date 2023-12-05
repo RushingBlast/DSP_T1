@@ -119,10 +119,6 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.horizontalScrollBar.setVisible(False)
         self.verticalScrollBar.setVisible(False)
         self.view_widget.setMouseEnabled(x=False, y=False)
-        
-        # self.view_widget.getViewBox().setAutoPan(x=True)
-        # self.view_widget.getViewBox().enableAutoRange(x = True)
-        # self.view_widget.getViewBox().setAutoVisible(x = True)
        
        # Disable buttons except for Add_signal
         self.btn_zoom_in.setEnabled(False)
@@ -297,21 +293,16 @@ class class_signal_viewer(QWidget, Ui_Form):
 
 # Update plot widget
     def update(self):
-        if len(self.loaded_signals) != 0:
-            
-            x_min , x_max = self.view_widget.viewRange()[0]
-            
+        if self.loaded_signals:
             # Iterates over each signal in loaded signals and extends data by current_index
             for curve in self.loaded_signals:
                 curve.setData(curve.original_data[0: self.current_index])              
             
             if self.current_index > self.x_max:   
                 self.x_max += int(self.animation_speed)
-                self.x_min += int(self.animation_speed)        
+                self.x_min += int(self.animation_speed)    
                 self.view_widget.setLimits(xMax = self.current_index)
-            # self.view_widget.setXRange(self.x_min, self.x_max)
-            # self.view_widget.setXRange(x_min, x_max)
-            self.view_widget.getViewBox().translateBy(x = self.animation_speed)
+            self.view_widget.setXRange(self.x_min, self.x_max)
 
             
             self.current_index += int(self.animation_speed) # Convert the speed value to integer
@@ -419,9 +410,10 @@ class class_signal_viewer(QWidget, Ui_Form):
 
         # Set the view range to show the first 10,000 points
         self.view_widget.setXRange(min_x, max_x)
-        # self.view_widget.setXRange(self.x_min, self.x_max)
         # self.view_widget.setLimits(yMin = min_y, yMax = max_y )
-        
+
+        # Auto range the view widget
+        self.view_widget.autoRange()
 
     # Function to find the data range of the loaded signals
     def find_data_range(self):
@@ -473,24 +465,44 @@ class class_signal_viewer(QWidget, Ui_Form):
 # Zoom in 
     def zoom_in(self):
         #Zoom in by adjusting x-axis and y-axis limits (decrease window size)
-       
+        # x_min, x_max = self.view_widget.viewRange()[0]
+        # y_min, y_max = self.view_widget.viewRange()[1]
+        # # # window_size_x = x_max - x_min
+        # # window_size_y = y_max - y_min
+        # # # new_window_size_x = max(10, window_size_x * 0.88)  # Limit minimum window size
+        # # new_window_size_y = max(10, window_size_y * 0.88)  
+        # # # center_x = (x_min + x_max) / 2
+        # # center_y = (y_min + y_max) / 2
+        # # # self.view_widget.setXRange(center_x - new_window_size_x / 2, center_x + new_window_size_x / 2)
+        # # self.view_widget.setYRange(center_y - new_window_size_y / 2, center_y + new_window_size_y / 2)
+        # # self.view_widget.setLimits(yMin = center_y - new_window_size_y / 2, yMax =  center_y + new_window_size_y / 2)
+        # self.view_widget.setXRange(x_min * 1.22 , x_max * 0.88)
+        # self.view_widget.setXRange(y_min * 1.22, y_max * 0.88)
+        
         viewBox = self.view_widget.getViewBox()
         viewBox_center = viewBox.viewRect().center()
         zoom_factor = 0.8
-        viewBox.scaleBy((zoom_factor, zoom_factor) , viewBox_center)
-        
-        
+        viewBox.scaleBy(zoom_factor, zoom_factor, center = viewBox_center)
         
 
 # Zoom out 
     def zoom_out(self):
         # Zoom out by adjusting x-axis y-axis limits (increase window size)
-        viewBox = self.view_widget.getViewBox()
-        viewBox_center = viewBox.viewRect().center()
-        zoom_factor = 1.2
-        viewBox.scaleBy((zoom_factor, zoom_factor) , viewBox_center)
-        
-       
+        # x_min, x_max = self.view_widget.viewRange()[0]
+        # window_size = x_max - x_min
+        # new_window_size = window_size * 1.12  # Increase window size by 10%
+        # center = (x_min + x_max) / 2
+        # self.view_widget.setXRange(center - new_window_size / 2, center + new_window_size / 2, padding=0)
+        x_min, x_max = self.view_widget.viewRange()[0]
+        y_min, y_max = self.view_widget.viewRange()[1]
+        window_size_x = x_max - x_min
+        window_size_y = y_max - y_min
+        new_window_size_x = window_size_x * 1.12  # Limit minimum window size
+        new_window_size_y = window_size_y * 1.12  
+        center_x = (x_min + x_max) / 2
+        center_y = (y_min + y_max) / 2
+        self.view_widget.setXRange(center_x - new_window_size_x / 2, center_x + new_window_size_x / 2)
+        self.view_widget.setYRange(center_y - new_window_size_y / 2, center_y + new_window_size_y / 2)
         
 
 

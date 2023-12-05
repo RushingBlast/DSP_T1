@@ -120,9 +120,8 @@ class class_signal_viewer(QWidget, Ui_Form):
         self.verticalScrollBar.setVisible(False)
         self.view_widget.setMouseEnabled(x=False, y=False)
         
-        # self.view_widget.getViewBox().setAutoPan(x=True)
-        # self.view_widget.getViewBox().enableAutoRange(x = True)
-        # self.view_widget.getViewBox().setAutoVisible(x = True)
+        self.view_widget.getViewBox().setAutoPan(x=True)
+        self.view_widget.getViewBox().enableAutoRange(True)
        
        # Disable buttons except for Add_signal
         self.btn_zoom_in.setEnabled(False)
@@ -297,21 +296,16 @@ class class_signal_viewer(QWidget, Ui_Form):
 
 # Update plot widget
     def update(self):
-        if len(self.loaded_signals) != 0:
-            
-            x_min , x_max = self.view_widget.viewRange()[0]
-            
+        if self.loaded_signals:
             # Iterates over each signal in loaded signals and extends data by current_index
             for curve in self.loaded_signals:
                 curve.setData(curve.original_data[0: self.current_index])              
             
             if self.current_index > self.x_max:   
                 self.x_max += int(self.animation_speed)
-                self.x_min += int(self.animation_speed)        
+                self.x_min += int(self.animation_speed)    
                 self.view_widget.setLimits(xMax = self.current_index)
             # self.view_widget.setXRange(self.x_min, self.x_max)
-            # self.view_widget.setXRange(x_min, x_max)
-            self.view_widget.getViewBox().translateBy(x = self.animation_speed)
 
             
             self.current_index += int(self.animation_speed) # Convert the speed value to integer
@@ -419,9 +413,10 @@ class class_signal_viewer(QWidget, Ui_Form):
 
         # Set the view range to show the first 10,000 points
         self.view_widget.setXRange(min_x, max_x)
-        # self.view_widget.setXRange(self.x_min, self.x_max)
         # self.view_widget.setLimits(yMin = min_y, yMax = max_y )
-        
+
+        # Auto range the view widget
+        self.view_widget.autoRange()
 
     # Function to find the data range of the loaded signals
     def find_data_range(self):
@@ -478,7 +473,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         viewBox_center = viewBox.viewRect().center()
         zoom_factor = 0.8
         viewBox.scaleBy((zoom_factor, zoom_factor) , viewBox_center)
-        
+        viewBox.setAutoPan(x=True)
         
         
 
@@ -489,7 +484,7 @@ class class_signal_viewer(QWidget, Ui_Form):
         viewBox_center = viewBox.viewRect().center()
         zoom_factor = 1.2
         viewBox.scaleBy((zoom_factor, zoom_factor) , viewBox_center)
-        
+        viewBox.setAutoPan(x=True)
        
         
 

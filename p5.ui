@@ -16,44 +16,112 @@
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="1" column="0">
     <widget class="QWidget" name="wgt_viewer_controls" native="true">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0" rowspan="2" colspan="2">
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="1">
-         <widget class="QPushButton" name="btn_restart">
-          <property name="text">
-           <string/>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="btn_add_signal">
+        <property name="toolTip">
+         <string>Open File</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/add.png</normaloff>icons/add.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+O</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="btn_remove">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>34</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Remove Signal</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/remove.png</normaloff>icons/remove.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>50</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="btn_transfer">
+        <property name="toolTip">
+         <string>Move Signal</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/transfer.png</normaloff>icons/transfer.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="btn_clear">
+        <property name="toolTip">
+         <string>Clear All</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/clear.png</normaloff>icons/clear.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" rowspan="3">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QDial" name="dial_speed">
+          <property name="minimum">
+           <number>1</number>
           </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/restart.png</normaloff>icons/restart.png</iconset>
+          <property name="maximum">
+           <number>100</number>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
+          <property name="notchesVisible">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="btn_snapshot">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/scrrenshot.png</normaloff>icons/scrrenshot.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4" alignment="Qt::AlignHCenter">
+        <item alignment="Qt::AlignHCenter">
          <widget class="QLabel" name="lbl_speed">
           <property name="minimumSize">
            <size>
@@ -75,204 +143,159 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="btn_zoom_out">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/zoom_out.png</normaloff>icons/zoom_out.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="shortcut">
-           <string>Ctrl+Down</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QPushButton" name="btn_clear">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/clear.png</normaloff>icons/clear.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="btn_change_color">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/color.png</normaloff>icons/color.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="btn_transfer">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/transfer.png</normaloff>icons/transfer.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>40</width>
-            <height>25</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="btn_add_signal">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/add.png</normaloff>icons/add.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="shortcut">
-           <string>Ctrl+O</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2" alignment="Qt::AlignHCenter">
-         <widget class="QLabel" name="lbl_view">
-          <property name="maximumSize">
-           <size>
-            <width>60</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>View</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="btn_remove">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/remove.png</normaloff>icons/remove.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3">
-         <widget class="QPushButton" name="btn_link">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/link.png</normaloff>icons/link.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4" rowspan="3">
-         <widget class="QDial" name="dial_speed">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="notchesVisible">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QPushButton" name="btn_zoom_in">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/zoom_in.png</normaloff>icons/zoom_in.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="shortcut">
-           <string>Ctrl+Up</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="btn_start_pause">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>icons/play.png</normaloff>icons/play.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="shortcut">
-           <string>Space</string>
-          </property>
-         </widget>
-        </item>
        </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="btn_start_pause">
+        <property name="toolTip">
+         <string>Play/Pause</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/play.png</normaloff>icons/play.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>Space</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btn_restart">
+        <property name="toolTip">
+         <string>Rewind</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/restart.png</normaloff>icons/restart.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btn_change_color">
+        <property name="toolTip">
+         <string>Recolor Signal</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/color.png</normaloff>icons/color.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QPushButton" name="btn_link">
+        <property name="toolTip">
+         <string>Link Views</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/link.png</normaloff>icons/link.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="btn_zoom_in">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Zoom In</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/zoom_in.png</normaloff>icons/zoom_in.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Up</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="btn_zoom_out">
+        <property name="toolTip">
+         <string>Zoom out</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/zoom_out.png</normaloff>icons/zoom_out.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Down</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="2">
+       <widget class="QPushButton" name="btn_snapshot">
+        <property name="toolTip">
+         <string>Take Snapshot</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/scrrenshot.png</normaloff>icons/scrrenshot.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -304,31 +327,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="lbl_stats">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>19</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>No Signal Selected...</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

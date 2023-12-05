@@ -419,9 +419,10 @@ class class_signal_viewer(QWidget, Ui_Form):
 
         # Set the view range to show the first 10,000 points
         self.view_widget.setXRange(min_x, max_x)
-        # self.view_widget.setXRange(self.x_min, self.x_max)
         # self.view_widget.setLimits(yMin = min_y, yMax = max_y )
-        
+
+        # Auto range the view widget
+        self.view_widget.autoRange()
 
     # Function to find the data range of the loaded signals
     def find_data_range(self):

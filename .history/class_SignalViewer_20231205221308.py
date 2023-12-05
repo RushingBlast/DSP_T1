@@ -418,8 +418,8 @@ class class_signal_viewer(QWidget, Ui_Form):
             max_x = min_x + 10000
 
         # Set the view range to show the first 10,000 points
-        self.view_widget.setXRange(min_x, max_x)
-        # self.view_widget.setXRange(self.x_min, self.x_max)
+        # self.view_widget.setXRange(min_x, max_x)
+        self.view_widget.setXRange(self.x_min, self.x_max)
         # self.view_widget.setLimits(yMin = min_y, yMax = max_y )
         
 
